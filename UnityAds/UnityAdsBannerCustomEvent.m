@@ -14,7 +14,8 @@ static NSString *const kUnityAdsOptionPlacementIdKey = @"placementId";
 static NSString *const kUnityAdsOptionZoneIdKey = @"zoneId";
 
 @interface UnityAdsBannerCustomEvent ()
-@property (nonatomic) NSString* placementId;
+@property (nonatomic, strong) NSString* placementId;
+@property (nonatomic, strong) UADSBannerView* bannerAdView;
 @end
 
 @implementation UnityAdsBannerCustomEvent
@@ -27,7 +28,10 @@ static NSString *const kUnityAdsOptionZoneIdKey = @"zoneId";
 }
 
 -(void)dealloc {
-    [UnityAdsBanner destroy];
+    if (self.bannerAdView) {
+        self.bannerAdView.delegate = nil;
+    }
+    self.bannerAdView = nil;
 }
 
 -(void)requestAdWithSize:(CGSize)size customEventInfo:(NSDictionary *)info {
@@ -45,8 +49,12 @@ static NSString *const kUnityAdsOptionZoneIdKey = @"zoneId";
         [self.delegate bannerCustomEvent:self didFailToLoadAdWithError:error];
         return;
     }
+    [[UnityRouter sharedRouter] initializeWithGameId:gameId];
+    
+    self.bannerAdView = [[UADSBannerView alloc] initWithPlacementId:self.placementId size:size];
+    self.bannerAdView.delegate = self;
+    [self.bannerAdView load];
 
-    [[UnityRouter sharedRouter] requestBannerAdWithGameId:gameId placementId:self.placementId delegate:self];
     MPLogAdEvent([MPLogEvent adLoadAttemptForAdapter:NSStringFromClass(self.class) dspCreativeId:nil dspName:nil], [self getAdNetworkId]);
 }
 
@@ -62,33 +70,30 @@ static NSString *const kUnityAdsOptionZoneIdKey = @"zoneId";
     return [NSError errorWithDomain:NSStringFromClass([self class]) code:0 userInfo:userInfo];
 }
 
--(void)unityAdsBannerDidLoad:(NSString *)placementId view:(UIView *)view {
+#pragma mark - UADSBannerViewDelegate
+
+- (void)bannerViewDidLoad:(UADSBannerView *)bannerView {
     MPLogAdEvent([MPLogEvent adLoadSuccessForAdapter:NSStringFromClass(self.class)], [self getAdNetworkId]);
     MPLogAdEvent([MPLogEvent adShowAttemptForAdapter:NSStringFromClass(self.class)], [self getAdNetworkId]);
     MPLogAdEvent([MPLogEvent adShowSuccessForAdapter:NSStringFromClass(self.class)], [self getAdNetworkId]);
-
-    [self.delegate bannerCustomEvent:self didLoadAd:view];
+    [self.delegate bannerCustomEvent:self didLoadAd:bannerView];
 }
 
--(void)unityAdsBannerDidUnload:(NSString *)placementId {
-    MPLogInfo(@"Unity Banner did unload for placement %@", placementId);
-}
--(void)unityAdsBannerDidShow:(NSString *)placementId {
-    MPLogInfo(@"Unity Banner did show for placement %@", placementId);
-}
--(void)unityAdsBannerDidHide:(NSString *)placementId {
-    MPLogInfo(@"Unity Banner did hide for placement %@", placementId);
-}
--(void)unityAdsBannerDidClick:(NSString *)placementId {
+- (void)bannerViewDidClick:(UADSBannerView *)bannerView {
     MPLogAdEvent([MPLogEvent adTappedForAdapter:NSStringFromClass(self.class)], [self getAdNetworkId]);
+    [self.delegate trackClick];
+}
+
+- (void)bannerViewDidLeaveApplication:(UADSBannerView *)bannerView {
     [self.delegate bannerCustomEventWillLeaveApplication:self];
 }
--(void)unityAdsBannerDidError:(NSString *)message {
-    NSError *error = [self createErrorWith:@"Unity Ads failed to load an ad"
-                                 andReason:@""
-                             andSuggestion:@""];
 
-    MPLogAdEvent([MPLogEvent adLoadFailedForAdapter:NSStringFromClass(self.class) error:error], [self getAdNetworkId]);
+- (void)bannerViewDidError:(UADSBannerView *)bannerView error:(UADSBannerError *)error{
+    if ([error code] == UADSBannerErrorCodeNoFillError) {
+        NSError *mopubAdaptorErrorMessage = [self createErrorWith:@"Unity Ads Banner returned no fill" andReason:@"" andSuggestion:@""];
+        MPLogAdEvent([MPLogEvent adLoadFailedForAdapter:NSStringFromClass(self.class) error:mopubAdaptorErrorMessage], [self getAdNetworkId]);
+    }
+
     [self.delegate bannerCustomEvent:self didFailToLoadAdWithError:nil];
 }
 
