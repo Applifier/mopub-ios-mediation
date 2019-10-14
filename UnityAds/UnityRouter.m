@@ -41,8 +41,6 @@
 - (id) init {
     self = [super init];
     self.delegateMap = [[NSMutableDictionary alloc] init];
-    self.loadEnabled = YES;
-    self.firstBannerReady = YES;
     return self;
 }
 
@@ -105,20 +103,8 @@
         if (![UnityAds isInitialized]) {
             [self initializeWithGameId:gameId];
         }
-
-        if (self.loadEnabled) {
-             [UnityAds load:placementId];
-        } else {
-            if([UnityAds getPlacementState:placementId] == kUnityAdsPlacementStateNoFill){
-                NSError *error = [NSError errorWithDomain:MoPubRewardedVideoAdsSDKDomain code:MPRewardedVideoAdErrorNoAdsAvailable userInfo:nil];
-                [delegate unityAdsDidFailWithError:error];
-                return;
-                
-            }
-            if ([UnityAds isReady:placementId]) {
-                [self unityAdsReady:placementId];
-            }
-        }
+        [UnityAds load:placementId];
+    
         // MoPub timeout will handle the case for an ad failing to load.
     } else {
         NSError *error = [NSError errorWithDomain:MoPubRewardedVideoAdsSDKDomain code:MPRewardedVideoAdErrorUnknown userInfo:nil];
@@ -169,11 +155,6 @@
 
 - (void)unityAdsReady:(NSString *)placementId
 {
-    if(self.firstBannerReady) {
-        self.firstBannerReady = NO;
-    } else if (self.loadEnabled){
-        self.loadEnabled = NO;
-    }
     if ([placementId isEqualToString:self.bannerPlacementId] && self.bannerLoadRequested) {
         self.bannerLoadRequested = NO;
     } else if (!self.isAdPlaying) {
@@ -218,9 +199,6 @@
     id delegate = [self getDelegate:placementId];
     if (delegate != nil && [delegate respondsToSelector:@selector(unityAdsPlacementStateChanged:oldState:newState:)]) {
         [delegate unityAdsPlacementStateChanged:placementId oldState:oldState newState:newState];
-    }
-    if (delegate != nil && self.loadEnabled && newState == kUnityAdsPlacementStateReady) {
-        [delegate unityAdsReady:placementId];
     }
 
     if (delegate != nil && newState == kUnityAdsPlacementStateNoFill){
