@@ -26,11 +26,6 @@
 
 @property NSMutableDictionary* delegateMap;
 
-@property BOOL bannerLoadRequested;
-@property NSString* bannerPlacementId;
-@property BOOL loadEnabled;
-@property BOOL firstBannerReady;
-
 @property (nonatomic, assign) int impressionOrdinal;
 @property (nonatomic, assign) int missedImpressionOrdinal;
 
@@ -97,15 +92,14 @@
 
 - (void)requestVideoAdWithGameId:(NSString *)gameId placementId:(NSString *)placementId delegate:(id<UnityRouterDelegate>)delegate;
 {
+    [UnityAds load:placementId];
     if (!self.isAdPlaying) {
         [self.delegateMap setObject:delegate forKey:placementId];
         
         if (![UnityAds isInitialized]) {
             [self initializeWithGameId:gameId];
         }
-        [UnityAds load:placementId];
-    
-        // MoPub timeout will handle the case for an ad failing to load.
+      
     } else {
         NSError *error = [NSError errorWithDomain:MoPubRewardedVideoAdsSDKDomain code:MPRewardedVideoAdErrorUnknown userInfo:nil];
         [delegate unityAdsDidFailWithError:error];
@@ -155,9 +149,7 @@
 
 - (void)unityAdsReady:(NSString *)placementId
 {
-    if ([placementId isEqualToString:self.bannerPlacementId] && self.bannerLoadRequested) {
-        self.bannerLoadRequested = NO;
-    } else if (!self.isAdPlaying) {
+    if (!self.isAdPlaying) {
         id delegate = [self getDelegate:placementId];
         if (delegate != nil) {
             [delegate unityAdsReady:placementId];
