@@ -13,6 +13,8 @@
     #import "MPLogging.h"
 #endif
 
+NSString *const kFBVideoAdsEnabledKey = @"video_enabled";
+
 @interface FacebookNativeAdAdapter () <FBNativeAdDelegate>
 
 @property (nonatomic, readonly) FBAdOptionsView *adOptionsView;

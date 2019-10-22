@@ -1,3 +1,4 @@
+
 #import <VerizonAdsInlinePlacement/VerizonAdsInlinePlacement.h>
 #import <VerizonAdsStandardEdition/VerizonAdsStandardEdition.h>
 #import "MPVerizonBannerCustomEvent.h"
@@ -6,7 +7,7 @@
 #import "MPAdConfiguration.h"
 #endif
 #import "VerizonAdapterConfiguration.h"
-#import "MPVerizonBidCache.h"
+#import "VerizonBidCache.h"
 
 @interface MPVerizonBannerCustomEvent ()<VASInlineAdFactoryDelegate, VASInlineAdViewDelegate>
 @property (nonatomic, assign) BOOL didTrackClick;
@@ -37,8 +38,15 @@
     MPLogInfo(@"Requesting VAS banner with event info %@.", info);
     
     NSString *siteId = info[kMoPubVASAdapterSiteId];
+    if (siteId.length == 0)
+    {
+        siteId = info[kMoPubMillennialAdapterSiteId];
+    }
     NSString *placementId = info[kMoPubVASAdapterPlacementId];
-
+    if (placementId.length == 0)
+    {
+        placementId = info[kMoPubMillennialAdapterPlacementId];
+    }
     if (siteId.length == 0 || placementId.length == 0)
     {
         NSError *error = [VASErrorInfo errorWithDomain:kMoPubVASAdapterErrorDomain
@@ -68,14 +76,12 @@
     
     VASInlineAdSize *requestedSize = [[VASInlineAdSize alloc] initWithWidth:size.width height:size.height];
     
-    [VASAds sharedInstance].locationEnabled = [MoPub sharedInstance].locationUpdatesEnabled;
-    
     VASRequestMetadataBuilder *metaDataBuilder = [[VASRequestMetadataBuilder alloc] init];
     [metaDataBuilder setAppMediator:VerizonAdapterConfiguration.appMediator];
     self.inlineFactory = [[VASInlineAdFactory alloc] initWithPlacementId:placementId adSizes:@[requestedSize] vasAds:[VASAds sharedInstance] delegate:self];
     [self.inlineFactory setRequestMetadata:metaDataBuilder.build];
     
-    VASBid *bid = [MPVerizonBidCache.sharedInstance bidForPlacementId:placementId];
+    VASBid *bid = [VerizonBidCache.sharedInstance bidForPlacementId:placementId];
     
     if (bid) {
         [self.inlineFactory loadBid:bid inlineAdDelegate:self];
@@ -212,8 +218,7 @@
 
 + (void)requestBidWithPlacementId:(nonnull NSString *)placementId
                           adSizes:(nonnull NSArray<VASInlineAdSize *> *)adSizes
-                       completion:(nonnull VASBidRequestCompletionHandler)completion
-{
+                       completion:(nonnull VASBidRequestCompletionHandler)completion {
     VASRequestMetadataBuilder *metaDataBuilder = [[VASRequestMetadataBuilder alloc] init];
     [metaDataBuilder setAppMediator:VerizonAdapterConfiguration.appMediator];
     [VASInlineAdFactory requestBidForPlacementId:placementId
@@ -223,9 +228,9 @@
                                       completion:^(VASBid * _Nullable bid, VASErrorInfo * _Nullable errorInfo) {
                                           dispatch_async(dispatch_get_main_queue(), ^{
                                               if (bid) {
-                                                  [MPVerizonBidCache.sharedInstance storeBid:bid
-                                                                              forPlacementId:placementId
-                                                                                   untilDate:[NSDate dateWithTimeIntervalSinceNow:kMoPubVASAdapterSATimeoutInterval]];
+                                                  [VerizonBidCache.sharedInstance storeBid:bid
+                                                                            forPlacementId:placementId
+                                                                                 untilDate:[NSDate dateWithTimeIntervalSinceNow:kMoPubVASAdapterSATimeoutInterval]];
                                               }
                                               completion(bid,errorInfo);
                                           });
@@ -233,4 +238,6 @@
 }
 
 
+@end
+@implementation MPMillennialBannerCustomEvent
 @end

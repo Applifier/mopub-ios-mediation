@@ -27,7 +27,7 @@
 
 #pragma mark - MPInterstitialCustomEvent Subclass Methods
 
-- (void)requestInterstitialWithCustomEventInfo:(NSDictionary *)info adMarkup:(NSString *)adMarkup {
+- (void)requestInterstitialWithCustomEventInfo:(NSDictionary *)info {
     self.admobAdUnitId = [info objectForKey:@"adUnitID"];
     self.interstitial = [[GADInterstitial alloc] initWithAdUnitID:self.admobAdUnitId];
     self.interstitial.delegate = self;

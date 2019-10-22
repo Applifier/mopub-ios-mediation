@@ -1,7 +1,4 @@
 ## Changelog
-  * 12.3.4.0
-    * This version of the adapters has been certified with Tapjoy 12.3.4 and is compatible with iOS 13.
-    
   * 12.3.1.3
     * Set video delegate correctly to receive `TJPlacementVideoDelegate` callbacks so that the user is rewarded after video completion.
 

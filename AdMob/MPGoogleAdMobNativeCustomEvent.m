@@ -33,7 +33,7 @@ static GADAdChoicesPosition adChoicesPosition;
   }
 }
 
-- (void)requestAdWithCustomEventInfo:(NSDictionary *)info adMarkup:(NSString *)adMarkup {
+- (void)requestAdWithCustomEventInfo:(NSDictionary *)info {
   static dispatch_once_t onceToken;
   dispatch_once(&onceToken, ^{
     [[GADMobileAds sharedInstance] startWithCompletionHandler:^(GADInitializationStatus *status){

@@ -29,7 +29,7 @@
 
 #pragma mark - MPInterstitialCustomEvent Subclass Methods
 
-- (void)requestInterstitialWithCustomEventInfo:(NSDictionary *)info adMarkup:(NSString *)adMarkup
+- (void)requestInterstitialWithCustomEventInfo:(NSDictionary *)info
 {
     self.placementId = [info objectForKey:kVunglePlacementIdKey];
 
@@ -54,27 +54,25 @@
         NSMutableDictionary *options = [NSMutableDictionary dictionary];
         
         // VunglePlayAdOptionKeyUser
-        NSString *userId = [self.localExtras objectForKey:kVungleUserId];
-        if (userId != nil) {
-            NSString *userID = userId;
+        if ([[NSUserDefaults standardUserDefaults] objectForKey:kVungleUserId]) {
+            NSString *userID = [[NSUserDefaults standardUserDefaults] objectForKey:kVungleUserId];
             if (userID.length > 0) {
                 options[VunglePlayAdOptionKeyUser] = userID;
             }
         }
         
         // Ordinal
-        NSString *ordinal = [self.localExtras objectForKey:kVungleOrdinal];
-        if (ordinal != nil) {
-            NSNumber *ordinalPlaceholder = [NSNumber numberWithLongLong:[ordinal longLongValue]];
+        if ([[NSUserDefaults standardUserDefaults] objectForKey:kVungleOrdinal]) {
+            NSNumber *ordinalPlaceholder = [NSNumber numberWithLongLong:[[[NSUserDefaults standardUserDefaults] objectForKey:kVungleOrdinal] longLongValue]];
             NSUInteger ordinal = ordinalPlaceholder.unsignedIntegerValue;
             if (ordinal > 0) {
                 options[VunglePlayAdOptionKeyOrdinal] = @(ordinal);
             }
         }
         
-        NSString *flexVieAutoDismissSeconds = [self.localExtras objectForKey:kVungleFlexViewAutoDismissSeconds];
-        if (flexVieAutoDismissSeconds != nil) {
-            NSTimeInterval flexDismissTime = [flexVieAutoDismissSeconds floatValue];
+        // FlexVieAutoDismissSeconds
+        if ([[NSUserDefaults standardUserDefaults] objectForKey:kVungleFlexViewAutoDismissSeconds]) {
+            NSTimeInterval flexDismissTime = [[[NSUserDefaults standardUserDefaults] objectForKey:kVungleFlexViewAutoDismissSeconds] floatValue];
             if (flexDismissTime > 0) {
                 options[VunglePlayAdOptionKeyFlexViewAutoDismissSeconds] = @(flexDismissTime);
             }
@@ -109,11 +107,9 @@
 
 - (void)vungleAdWillAppear
 {
+
     MPLogAdEvent([MPLogEvent adWillAppearForAdapter:NSStringFromClass(self.class)], self.placementId);
     [self.delegate interstitialCustomEventWillAppear:self];
-}
-
-- (void)vungleAdDidAppear {
     MPLogAdEvent([MPLogEvent adShowSuccessForAdapter:NSStringFromClass(self.class)], self.placementId);
     MPLogAdEvent([MPLogEvent adDidAppearForAdapter:NSStringFromClass(self.class)], self.placementId);
     [self.delegate interstitialCustomEventDidAppear:self];
@@ -149,7 +145,4 @@
     [self.delegate interstitialCustomEvent:self didFailToLoadAdWithError:error];
 }
 
-- (NSString *)getPlacementID {
-    return self.placementId;
-}
 @end

@@ -5,7 +5,7 @@
 #import "MPLogging.h"
 #endif
 #import "VerizonAdapterConfiguration.h"
-#import "MPVerizonBidCache.h"
+#import "VerizonBidCache.h"
 
 @interface MPVerizonInterstitialCustomEvent () <VASInterstitialAdFactoryDelegate, VASInterstitialAdDelegate>
 
@@ -43,8 +43,15 @@
     MPLogInfo(@"Requesting VAS interstitial with event info %@.", info);
     
     NSString *siteId = info[kMoPubVASAdapterSiteId];
+    if (siteId.length == 0)
+    {
+        siteId = info[kMoPubMillennialAdapterSiteId];
+    }
     NSString *placementId = info[kMoPubVASAdapterPlacementId];
-
+    if (placementId.length == 0)
+    {
+        placementId = info[kMoPubMillennialAdapterPlacementId];
+    }
     if (siteId.length == 0 || placementId.length == 0)
     {
         NSError *error = [VASErrorInfo errorWithDomain:kMoPubVASAdapterErrorDomain
@@ -73,14 +80,12 @@
         return;
     }
     
-    [VASAds sharedInstance].locationEnabled = [MoPub sharedInstance].locationUpdatesEnabled;
-    
     VASRequestMetadataBuilder *metaDataBuilder = [[VASRequestMetadataBuilder alloc] init];
     [metaDataBuilder setAppMediator:VerizonAdapterConfiguration.appMediator];
     self.interstitialAdFactory = [[VASInterstitialAdFactory alloc] initWithPlacementId:placementId vasAds:[VASAds sharedInstance] delegate:self];
     [self.interstitialAdFactory setRequestMetadata:metaDataBuilder.build];
     
-    VASBid *bid = [MPVerizonBidCache.sharedInstance bidForPlacementId:placementId];
+    VASBid *bid = [VerizonBidCache.sharedInstance bidForPlacementId:placementId];
     if (bid) {
         [self.interstitialAdFactory loadBid:bid interstitialAdDelegate:self];
     } else {
@@ -111,6 +116,7 @@
 
 - (void)interstitialAdFactory:(nonnull VASInterstitialAdFactory *)adFactory didFailWithError:(nonnull VASErrorInfo *)errorInfo
 {
+    
     __weak __typeof__(self) weakSelf = self;
     dispatch_async(dispatch_get_main_queue(), ^{
         __strong __typeof__(self) strongSelf = weakSelf;
@@ -125,6 +131,7 @@
 
 - (void)interstitialAdFactory:(nonnull VASInterstitialAdFactory *)adFactory didLoadInterstitialAd:(nonnull VASInterstitialAd *)interstitialAd
 {
+    
     __weak __typeof__(self) weakSelf = self;
     dispatch_async(dispatch_get_main_queue(), ^{
         __strong __typeof__(self) strongSelf = weakSelf;
@@ -144,6 +151,7 @@
 
 - (void)interstitialAdClicked:(nonnull VASInterstitialAd *)interstitialAd
 {
+    
     __weak __typeof__(self) weakSelf = self;
     dispatch_async(dispatch_get_main_queue(), ^{
         __strong __typeof__(self) strongSelf = weakSelf;
@@ -167,6 +175,7 @@
 
 - (void)interstitialAdDidFail:(nonnull VASInterstitialAd *)interstitialAd withError:(nonnull VASErrorInfo *)errorInfo
 {
+    
     __weak __typeof__(self) weakSelf = self;
     dispatch_async(dispatch_get_main_queue(), ^{
         __strong __typeof__(self) strongSelf = weakSelf;
@@ -182,6 +191,7 @@
 
 - (void)interstitialAdDidLeaveApplication:(nonnull VASInterstitialAd *)interstitialAd
 {
+    
     __weak __typeof__(self) weakSelf = self;
     dispatch_async(dispatch_get_main_queue(), ^{
         __strong __typeof__(self) strongSelf = weakSelf;
@@ -217,6 +227,7 @@
 
 - (void)interstitialAdDidClose:(nonnull VASInterstitialAd *)interstitialAd
 {
+    
     __weak __typeof__(self) weakSelf = self;
     dispatch_async(dispatch_get_main_queue(), ^{
         __strong __typeof__(self) strongSelf = weakSelf;
@@ -241,20 +252,21 @@
 #pragma mark - Super Auction
 
 + (void)requestBidWithPlacementId:(nonnull NSString *)placementId
-                       completion:(nonnull VASBidRequestCompletionHandler)completion
-{
+                       completion:(nonnull VASBidRequestCompletionHandler)completion {
     VASRequestMetadataBuilder *metaDataBuilder = [[VASRequestMetadataBuilder alloc] init];
     [metaDataBuilder setAppMediator:VerizonAdapterConfiguration.appMediator];
     [VASInterstitialAdFactory requestBidForPlacementId:placementId requestMetadata:metaDataBuilder.build vasAds:[VASAds sharedInstance] completionHandler:^(VASBid * _Nullable bid, VASErrorInfo * _Nullable errorInfo) {
         dispatch_async(dispatch_get_main_queue(), ^{
             if (bid) {
-                [MPVerizonBidCache.sharedInstance storeBid:bid
-                                            forPlacementId:placementId
-                                                 untilDate:[NSDate dateWithTimeIntervalSinceNow:kMoPubVASAdapterSATimeoutInterval]];
+                [VerizonBidCache.sharedInstance storeBid:bid
+                                          forPlacementId:placementId
+                                               untilDate:[NSDate dateWithTimeIntervalSinceNow:kMoPubVASAdapterSATimeoutInterval]];
             }
             completion(bid,errorInfo);
         });
     }];
 }
 
+@end
+@implementation MPMillennialInterstitialCustomEvent
 @end

@@ -1,5 +1,15 @@
-#import "MPVerizonBidCache.h"
+///
+///  @file
+///  @brief Implementation for VerizonBidCache
+///
+///  @copyright Copyright (c) 2019 Verizon. All rights reserved.
+///
+
+#import "VerizonBidCache.h"
 #import <VerizonAdsInlinePlacement/VerizonAdsInlinePlacement.h>
+#if __has_include("MoPub.h")
+#import "MoPub.h"
+#endif
 
 #pragma mark - Timer
 
@@ -25,26 +35,25 @@
 @end
 
 
-@interface MPVerizonBidCache ()
+@interface VerizonBidCache ()
 
 @property (nonatomic, nonnull, readonly) NSCache<NSString*, VASBid *> *cache;
 
 @end
 
-@implementation MPVerizonBidCache
+@implementation VerizonBidCache
 
 + (instancetype)sharedInstance
 {
-    static MPVerizonBidCache *_bidCache = nil;
+    static VerizonBidCache *_bidCache = nil;
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
-        _bidCache = [[MPVerizonBidCache alloc] init];
+        _bidCache = [[VerizonBidCache alloc] init];
     });
     return _bidCache;
 }
 
-- (instancetype)init
-{
+- (instancetype)init {
     self = [super init];
     if (self) {
         _cache = [[NSCache alloc] init];
@@ -52,20 +61,18 @@
     return self;
 }
 
-- (nullable VASBid *)bidForPlacementId:(nonnull NSString *)placementId
-{
+- (nullable VASBid *)bidForPlacementId:(nonnull NSString *)placementId {
     return [self.cache objectForKey:placementId];
 }
 
 - (void)storeBid:(nonnull VASBid *)bid
-  forPlacementId:(nonnull NSString *)placementId
-       untilDate:(nonnull NSDate *)expirationDate
-{
+          forPlacementId:(nonnull NSString *)placementId
+               untilDate:(nonnull NSDate *)expirationDate {
     MPLogDebug(@"Store bid %@-%@ in the cache, expiration date %@", bid, placementId, expirationDate);
     
     [self.cache setObject:bid forKey:placementId];
     
-    __weak MPVerizonBidCache *weakSelf = self;
+    __weak VerizonBidCache *weakSelf = self;
     __weak VASBid *weakBid = bid;
     dispatch_async(dispatch_get_main_queue(), ^{
         [NSTimer bidCacheScheduledTimerWithTimeInterval:[expirationDate timeIntervalSinceNow] block:^(NSTimer *timer) {
@@ -82,8 +89,7 @@
 #pragma mark - Private
 
 - (void)expirationTimerFiredForBid:(VASBid *)bid
-                   withPlacementId:(NSString *)placementId
-{
+                   withPlacementId:(NSString *)placementId {
     //process only items in the cache
     if (bid != nil && bid == [self bidForPlacementId:placementId]) {
         MPLogDebug(@"%s (%@)", __PRETTY_FUNCTION__, placementId);

@@ -31,7 +31,7 @@ static NSString *const kUnityAdsOptionZoneIdKey = @"zoneId";
     [[UnityRouter sharedRouter] clearDelegate:self];
 }
 
-- (void)requestInterstitialWithCustomEventInfo:(NSDictionary *)info adMarkup:(NSString *)adMarkup {
+- (void)requestInterstitialWithCustomEventInfo:(NSDictionary *)info {
     self.loadRequested = YES;
     NSString *gameId = [info objectForKey:kMPUnityInterstitialVideoGameId];
     self.placementId = [info objectForKey:kUnityAdsOptionPlacementIdKey];

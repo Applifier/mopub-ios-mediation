@@ -21,7 +21,7 @@
 
 @implementation ChartboostRewardedVideoCustomEvent
 
-- (void)requestRewardedVideoWithCustomEventInfo:(NSDictionary *)info adMarkup:(NSString *)adMarkup
+- (void)requestRewardedVideoWithCustomEventInfo:(NSDictionary *)info
 {
     self.appId = [info objectForKey:@"appId"];
 

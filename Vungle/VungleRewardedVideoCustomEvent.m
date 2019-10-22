@@ -32,7 +32,7 @@
     [[VungleRouter sharedRouter] initializeSdkWithInfo:parameters];
 }
 
-- (void)requestRewardedVideoWithCustomEventInfo:(NSDictionary *)info adMarkup:(NSString *)adMarkup
+- (void)requestRewardedVideoWithCustomEventInfo:(NSDictionary *)info
 {
     self.placementId = [info objectForKey:kVunglePlacementIdKey];
 
@@ -80,7 +80,6 @@
     MPLogAdEvent([MPLogEvent adLoadSuccessForAdapter:NSStringFromClass(self.class)], self.placementId);
     [self.delegate rewardedVideoDidLoadAdForCustomEvent:self];
 }
-
 - (void)vungleAdWillAppear
 {
     MPLogAdEvent([MPLogEvent adWillAppearForAdapter:NSStringFromClass(self.class)], self.placementId);
@@ -89,13 +88,6 @@
     MPLogAdEvent([MPLogEvent adDidAppearForAdapter:NSStringFromClass(self.class)], self.placementId);
     [self.delegate rewardedVideoDidAppearForCustomEvent:self];
 }
-
-- (void)vungleAdDidAppear {
-    MPLogAdEvent([MPLogEvent adShowSuccessForAdapter:NSStringFromClass(self.class)], self.placementId);
-    MPLogAdEvent([MPLogEvent adDidAppearForAdapter:NSStringFromClass(self.class)], self.placementId);
-    [self.delegate rewardedVideoDidAppearForCustomEvent:self];
-}
-
 - (void)vungleAdWillDisappear
 {
     MPLogAdEvent([MPLogEvent adWillDisappearForAdapter:NSStringFromClass(self.class)], self.placementId);
@@ -119,6 +111,7 @@
     [self.delegate rewardedVideoShouldRewardUserForCustomEvent:self reward:[[MPRewardedVideoReward alloc] initWithCurrencyAmount:@(kMPRewardedVideoRewardCurrencyAmountUnspecified)]];
 }
 
+
 - (void)vungleAdDidFailToLoad:(NSError *)error
 {
     MPLogAdEvent([MPLogEvent adLoadFailedForAdapter:NSStringFromClass(self.class) error:error], self.placementId);
@@ -129,10 +122,6 @@
 {
     MPLogAdEvent([MPLogEvent adShowFailedForAdapter:NSStringFromClass(self.class) error:error], self.placementId);
     [self.delegate rewardedVideoDidFailToPlayForCustomEvent:self error:error];
-}
-
-- (NSString *)getPlacementID {
-    return self.placementId;
 }
 
 @end

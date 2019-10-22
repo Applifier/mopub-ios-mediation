@@ -59,7 +59,7 @@
     return [NSError errorWithDomain:NSStringFromClass([self class]) code:0 userInfo:userInfo];
 }
 
-- (void)requestRewardedVideoWithCustomEventInfo:(NSDictionary *)info adMarkup:(NSString *)adMarkup {
+- (void)requestRewardedVideoWithCustomEventInfo:(NSDictionary *)info {
     NSString *appId = [info objectForKey:@"appId"];
     NSArray *allZoneIds = [info objectForKey:@"allZoneIds"];
     

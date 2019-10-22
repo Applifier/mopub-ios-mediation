@@ -1,7 +1,4 @@
 ## Changelog
-  * 3.3.8.1.2
-    * Stop implementing deprecated request API.
-
   * 3.3.8.1.1
     * Update extracting zone IDs `initializeNetworkWithConfiguration` to accommodate Unity MoPubManager changes.
     
