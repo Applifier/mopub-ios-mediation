@@ -19,9 +19,12 @@ static NSString *const kMPUnityRewardedVideoGameId = @"gameId";
 static NSString *const kUnityAdsOptionPlacementIdKey = @"placementId";
 static NSString *const kUnityAdsOptionZoneIdKey = @"zoneId";
 
-@interface UnityAdsRewardedVideoCustomEvent () <UnityRouterDelegate>
+@interface UnityAdsRewardedVideoCustomEvent () <UnityRouterDelegate, UnityAdsHeaderBiddingDelegate>
 
 @property (nonatomic, copy) NSString *placementId;
+@property (nonatomic, copy) NSString *uuid;
+@property (nonatomic) BOOL bidLoaded;
+@property (nonatomic) BOOL useHeaderBidding;
 
 @end
 
@@ -67,13 +70,27 @@ static NSString *const kUnityAdsOptionZoneIdKey = @"zoneId";
         MPLogAdEvent([MPLogEvent adLoadFailedForAdapter:NSStringFromClass(self.class) error:error], [self getAdNetworkId]);
         return;
     }
-
+    
+    if (adMarkup == nil) {
+        self.useHeaderBidding = NO;
+    } else {
+        self.useHeaderBidding = YES;
+        self.uuid = [[NSUUID UUID] UUIDString];
+        self.bidLoaded = NO;
+        [UnityAds addDelegate:self];
+        [UnityAds loadBid:self.uuid placement:self.placementId bid:adMarkup];
+    }
+    
     [[UnityRouter sharedRouter] requestVideoAdWithGameId:gameId placementId:self.placementId delegate:self];
+
     MPLogAdEvent([MPLogEvent adLoadAttemptForAdapter:NSStringFromClass(self.class) dspCreativeId:nil dspName:nil], [self getAdNetworkId]);
 }
 
 - (BOOL)hasAdAvailable
 {
+    if (self.useHeaderBidding) {
+        return [[UnityRouter sharedRouter] isAdAvailableForPlacementId:self.placementId] && self.bidLoaded;
+    }
     return [[UnityRouter sharedRouter] isAdAvailableForPlacementId:self.placementId];
 }
 
@@ -85,7 +102,12 @@ static NSString *const kUnityAdsOptionZoneIdKey = @"zoneId";
         NSString *customerId = [self.delegate customerIdForRewardedVideoCustomEvent:self];
 
         MPLogAdEvent([MPLogEvent adShowAttemptForAdapter:NSStringFromClass(self.class)], [self getAdNetworkId]);
-        [[UnityRouter sharedRouter] presentVideoAdFromViewController:viewController customerId:customerId placementId:self.placementId settings:settings delegate:self];
+        
+        if (self.useHeaderBidding) {
+            [[UnityRouter sharedRouter] presentVideoAdFromViewController:viewController customerId:customerId placementId:self.uuid settings:settings delegate:self];
+        } else {
+            [[UnityRouter sharedRouter] presentVideoAdFromViewController:viewController customerId:customerId placementId:self.placementId settings:settings delegate:self];
+        }
 
         MPLogAdEvent([MPLogEvent adShowSuccessForAdapter:NSStringFromClass(self.class)], [self getAdNetworkId]);
     } else {
@@ -114,6 +136,9 @@ static NSString *const kUnityAdsOptionZoneIdKey = @"zoneId";
 
 - (void)unityAdsReady:(NSString *)placementId
 {
+    if (self.useHeaderBidding) {
+        return;
+    }
     [self.delegate rewardedVideoDidLoadAdForCustomEvent:self];
     MPLogAdEvent([MPLogEvent adLoadSuccessForAdapter:NSStringFromClass(self.class)], [self getAdNetworkId]);
 }
@@ -198,12 +223,41 @@ static NSString *const kUnityAdsOptionZoneIdKey = @"zoneId";
 
 - (void)unityAdsDidFailWithError:(NSError *)error
 {
+    if (self.useHeaderBidding) {
+        return;
+    }
     [self.delegate rewardedVideoDidFailToLoadAdForCustomEvent:self error:error];
     MPLogAdEvent([MPLogEvent adLoadFailedForAdapter:NSStringFromClass(self.class) error:error], [self getAdNetworkId]);
 }
 
 - (NSString *) getAdNetworkId {
     return (self.placementId != nil) ? self.placementId : @"";
+}
+
+- (void)unityAdsBidFailedToLoad:(NSString*)uuid {
+    if (self.uuid == uuid) {
+        [UnityAds removeDelegate:self];
+        self.bidLoaded = NO;
+        
+        NSError* error = [NSError errorWithDomain:MoPubRewardedVideoAdsSDKDomain code:MPRewardedVideoAdErrorUnknown userInfo:nil];
+        
+        [self.delegate rewardedVideoDidFailToLoadAdForCustomEvent:self error:error];
+        MPLogAdEvent([MPLogEvent adLoadFailedForAdapter:NSStringFromClass(self.class) error:error], [self getAdNetworkId]);
+    }
+}
+
+- (void)unityAdsBidLoaded:(NSString*)uuid {
+    if (self.uuid == uuid) {
+        [UnityAds removeDelegate:self];
+        self.bidLoaded = YES;
+        
+        [self.delegate rewardedVideoDidLoadAdForCustomEvent:self];
+        MPLogAdEvent([MPLogEvent adLoadSuccessForAdapter:NSStringFromClass(self.class)], [self getAdNetworkId]);
+    }
+}
+
+- (void)unityAdsTokenReady:(nonnull NSString *)token {
+    
 }
 
 @end

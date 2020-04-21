@@ -14,13 +14,15 @@
 #import "MPBaseAdapterConfiguration.h"
 #endif
 
+#include <UnityAds/UnityAdsDelegate.h>
+
 NS_ASSUME_NONNULL_BEGIN
 
 /**
  Provides adapter information back to the SDK and is the main access point
  for all adapter-level configuration.
  */
-@interface UnityAdsAdapterConfiguration : MPBaseAdapterConfiguration
+@interface UnityAdsAdapterConfiguration : MPBaseAdapterConfiguration<UnityAdsDelegate, UnityAdsHeaderBiddingDelegate>
 // Caching
 /**
  Extracts the parameters used for network SDK initialization and if all required
