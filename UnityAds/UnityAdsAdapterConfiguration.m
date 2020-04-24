@@ -53,7 +53,6 @@ typedef NS_ENUM(NSInteger, UnityAdsAdapterErrorCode) {
 - (NSString *)biddingToken {
     if (!s_ReuqestingToken) {
         s_ReuqestingToken = YES;
-        [UnityAds addDelegate:self];
         [UnityAds requestToken];
     }
     return s_CurrentToken;
@@ -94,7 +93,6 @@ typedef NS_ENUM(NSInteger, UnityAdsAdapterErrorCode) {
 - (void)unityAdsTokenReady:(NSString*)token {
     s_ReuqestingToken = NO;
     s_CurrentToken = token;
-    [UnityAds removeDelegate:self];
 }
 
 - (void)unityAdsBidFailedToLoad:(NSString*)uuid {
