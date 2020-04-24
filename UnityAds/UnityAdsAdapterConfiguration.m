@@ -88,6 +88,7 @@ typedef NS_ENUM(NSInteger, UnityAdsAdapterErrorCode) {
     BOOL debugModeEnabled = logLevel == MPBLogLevelDebug;
 
     [UnityAds setDebugMode:debugModeEnabled];
+    [UnityAds addDelegate:self];
 }
 
 - (void)unityAdsTokenReady:(NSString*)token {
