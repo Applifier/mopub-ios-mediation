@@ -22,8 +22,6 @@ static NSString * const kUnityAdsGameId = @"gameId";
 // Errors
 static NSString * const kAdapterErrorDomain = @"com.mopub.mopub-ios-sdk.mopub-unity-adapters";
 
-static NSString* s_CurrentToken = nil;
-static BOOL s_ReuqestingToken = NO;
 
 typedef NS_ENUM(NSInteger, UnityAdsAdapterErrorCode) {
     UnityAdsAdapterErrorCodeMissingGameId,
@@ -51,11 +49,7 @@ typedef NS_ENUM(NSInteger, UnityAdsAdapterErrorCode) {
 }
 
 - (NSString *)biddingToken {
-    if (!s_ReuqestingToken) {
-        s_ReuqestingToken = YES;
-        [UnityAds requestToken];
-    }
-    return s_CurrentToken;
+    return [UnityAds requestToken];
 }
 
 - (NSString *)moPubNetworkName {
@@ -92,8 +86,6 @@ typedef NS_ENUM(NSInteger, UnityAdsAdapterErrorCode) {
 }
 
 - (void)unityAdsTokenReady:(NSString*)token {
-    s_ReuqestingToken = NO;
-    s_CurrentToken = token;
 }
 
 - (void)unityAdsBidFailedToLoad:(NSString*)uuid {
