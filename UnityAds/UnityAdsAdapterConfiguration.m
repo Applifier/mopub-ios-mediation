@@ -22,6 +22,7 @@ static NSString * const kUnityAdsGameId = @"gameId";
 // Errors
 static NSString * const kAdapterErrorDomain = @"com.mopub.mopub-ios-sdk.mopub-unity-adapters";
 
+
 typedef NS_ENUM(NSInteger, UnityAdsAdapterErrorCode) {
     UnityAdsAdapterErrorCodeMissingGameId,
 };
@@ -48,7 +49,7 @@ typedef NS_ENUM(NSInteger, UnityAdsAdapterErrorCode) {
 }
 
 - (NSString *)biddingToken {
-    return nil;
+    return [UnityAds requestToken];
 }
 
 - (NSString *)moPubNetworkName {
@@ -81,6 +82,29 @@ typedef NS_ENUM(NSInteger, UnityAdsAdapterErrorCode) {
     BOOL debugModeEnabled = logLevel == MPBLogLevelDebug;
 
     [UnityAds setDebugMode:debugModeEnabled];
+    [UnityAds addDelegate:self];
+}
+
+- (void)unityAdsTokenReady:(NSString*)token {
+}
+
+- (void)unityAdsBidFailedToLoad:(NSString*)uuid {
+}
+
+
+- (void)unityAdsBidLoaded:(NSString*)uuid {
+}
+
+- (void)unityAdsDidError:(UnityAdsError)error withMessage:(nonnull NSString *)message {
+}
+
+- (void)unityAdsDidFinish:(nonnull NSString *)placementId withFinishState:(UnityAdsFinishState)state {
+}
+
+- (void)unityAdsDidStart:(nonnull NSString *)placementId {
+}
+
+- (void)unityAdsReady:(nonnull NSString *)placementId {
 }
 
 @end

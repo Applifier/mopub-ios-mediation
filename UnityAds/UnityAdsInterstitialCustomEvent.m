@@ -17,10 +17,13 @@ static NSString *const kMPUnityInterstitialVideoGameId = @"gameId";
 static NSString *const kUnityAdsOptionPlacementIdKey = @"placementId";
 static NSString *const kUnityAdsOptionZoneIdKey = @"zoneId";
 
-@interface UnityAdsInterstitialCustomEvent () <UnityRouterDelegate>
+@interface UnityAdsInterstitialCustomEvent () <UnityRouterDelegate, UnityAdsHeaderBiddingDelegate>
 
 @property BOOL loadRequested;
 @property (nonatomic, copy) NSString *placementId;
+@property (nonatomic, copy) NSString *uuid;
+@property (nonatomic) BOOL bidLoaded;
+@property (nonatomic) BOOL useHeaderBidding;
 
 @end
 
@@ -50,8 +53,19 @@ static NSString *const kUnityAdsOptionZoneIdKey = @"zoneId";
     
     // Only need to cache game ID for SDK initialization
     [UnityAdsAdapterConfiguration updateInitializationParameters:info];
-
+    
+    if (adMarkup == nil) {
+        self.useHeaderBidding = NO;
+    } else {
+        self.useHeaderBidding = YES;
+        self.uuid = [[NSUUID UUID] UUIDString];
+        self.bidLoaded = NO;
+        [UnityAds addDelegate:self];
+        [UnityAds loadBid:self.uuid placement:self.placementId bid:adMarkup];
+    }
+    
     [[UnityRouter sharedRouter] requestVideoAdWithGameId:gameId placementId:self.placementId delegate:self];
+
     MPLogAdEvent([MPLogEvent adLoadAttemptForAdapter:NSStringFromClass(self.class) dspCreativeId:nil dspName:nil], [self getAdNetworkId]);
 }
 
@@ -67,6 +81,9 @@ static NSString *const kUnityAdsOptionZoneIdKey = @"zoneId";
 
 - (BOOL)hasAdAvailable
 {
+    if (self.useHeaderBidding) {
+        return [[UnityRouter sharedRouter] isAdAvailableForPlacementId:self.placementId] && self.bidLoaded;
+    }
     return [[UnityRouter sharedRouter] isAdAvailableForPlacementId:self.placementId];
 }
 
@@ -74,7 +91,11 @@ static NSString *const kUnityAdsOptionZoneIdKey = @"zoneId";
 {
     if ([self hasAdAvailable]) {
         MPLogAdEvent([MPLogEvent adShowAttemptForAdapter:NSStringFromClass(self.class)], [self getAdNetworkId]);
-        [[UnityRouter sharedRouter] presentVideoAdFromViewController:viewController customerId:nil placementId:self.placementId settings:nil delegate:self];
+        if (self.useHeaderBidding) {
+            [[UnityRouter sharedRouter] presentVideoAdFromViewController:viewController customerId:nil placementId:self.uuid settings:nil delegate:self];
+        } else {
+            [[UnityRouter sharedRouter] presentVideoAdFromViewController:viewController customerId:nil placementId:self.placementId settings:nil delegate:self];
+        }
     } else {
         NSError *error = [self createErrorWith:@"Unity Ads failed to load failed to show Unity Interstitial"
                                  andReason:@"There is no available video ad."
@@ -103,6 +124,9 @@ static NSString *const kUnityAdsOptionZoneIdKey = @"zoneId";
 
 - (void)unityAdsReady:(NSString *)placementId
 {
+    if (self.useHeaderBidding) {
+        return;
+    }
     if (self.loadRequested) {
         [self.delegate interstitialCustomEvent:self didLoadAd:placementId];
         MPLogAdEvent([MPLogEvent adLoadSuccessForAdapter:NSStringFromClass(self.class)], [self getAdNetworkId]);
@@ -146,12 +170,49 @@ static NSString *const kUnityAdsOptionZoneIdKey = @"zoneId";
 
 - (void)unityAdsDidFailWithError:(NSError *)error
 {
+    if (self.useHeaderBidding) {
+        return;
+    }
     [self.delegate interstitialCustomEvent:self didFailToLoadAdWithError:error];
     MPLogAdEvent([MPLogEvent adLoadFailedForAdapter:NSStringFromClass(self.class) error:error], [self getAdNetworkId]);
 }
 
 - (NSString *) getAdNetworkId {
     return (self.placementId != nil) ? self.placementId : @"";
+}
+
+- (void)unityAdsBidFailedToLoad:(NSString*)uuid {
+    if ([self.uuid isEqualToString:uuid]) {
+        [UnityAds removeDelegate:self];
+        self.bidLoaded = NO;
+        
+        if (self.loadRequested) {
+            NSError *error = [self createErrorWith:@"Unity Ads Failed to Load Bid"
+                andReason:@"There is no available video ad."
+            andSuggestion:@""];
+            
+            
+            [self.delegate interstitialCustomEvent:self didFailToLoadAdWithError:error];
+            MPLogAdEvent([MPLogEvent adLoadFailedForAdapter:NSStringFromClass(self.class) error:error], [self getAdNetworkId]);
+            self.loadRequested = NO;
+        }
+    }
+}
+
+- (void)unityAdsBidLoaded:(NSString*)uuid {
+    if ([self.uuid isEqualToString:uuid]) {
+        [UnityAds removeDelegate:self];
+        self.bidLoaded = YES;
+        
+        if (self.loadRequested) {
+            [self.delegate interstitialCustomEvent:self didLoadAd:self.placementId];
+            MPLogAdEvent([MPLogEvent adLoadSuccessForAdapter:NSStringFromClass(self.class)], [self getAdNetworkId]);
+            self.loadRequested = NO;
+        }
+    }
+}
+
+- (void)unityAdsTokenReady:(nonnull NSString *)token {
 }
 
 @end
