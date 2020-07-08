@@ -182,7 +182,7 @@ static NSString *const kUnityAdsOptionZoneIdKey = @"zoneId";
 }
 
 - (void)unityAdsBidFailedToLoad:(NSString*)uuid {
-    if (self.uuid == uuid) {
+    if ([self.uuid isEqualToString:uuid]) {
         [UnityAds removeDelegate:self];
         self.bidLoaded = NO;
         
@@ -200,7 +200,7 @@ static NSString *const kUnityAdsOptionZoneIdKey = @"zoneId";
 }
 
 - (void)unityAdsBidLoaded:(NSString*)uuid {
-    if (self.uuid == uuid) {
+    if ([self.uuid isEqualToString:uuid]) {
         [UnityAds removeDelegate:self];
         self.bidLoaded = YES;
         

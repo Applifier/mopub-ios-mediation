@@ -117,7 +117,7 @@
 
 - (void)presentVideoAdFromViewController:(UIViewController *)viewController customerId:(NSString *)customerId placementId:(NSString *)placementId settings:(UnityAdsInstanceMediationSettings *)settings delegate:(id<UnityRouterDelegate>)delegate
 {
-    if (!self.isAdPlaying && [self isAdAvailableForPlacementId:placementId]) {
+    if (!self.isAdPlaying) {
         self.isAdPlaying = YES;
         self.currentPlacementId = placementId;
         
