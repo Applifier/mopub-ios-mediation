@@ -1,4 +1,24 @@
 ## Changelog
+ * 6.3.5.0.0
+    * This version of the adapters has been certified with Mintegral 6.3.5.0 and MoPub 5.13.1.
+
+ * 6.3.4.0.0
+    * This version of the adapters has been certified with Mintegral 6.3.4.0 and MoPub 5.13.1.
+    * Add support for Mintegral's `onVideoAdDidClosed:`. MoPub's `fullscreenAdAdapterAdDidDisappear:` will fire at this time when the video has been closed.
+
+ * 6.3.3.0.0
+    * This version of the adapters has been certified with Mintegral 6.3.3.0 and MoPub 5.13.0.
+
+ * 6.2.0.0.2
+    * Refactor non-native adapter classes to use the new consolidated API from MoPub.
+    * To use this and newer adapter versions, you must use MoPub 5.13.0 or newer.
+
+ * 6.2.0.0.1
+    * Stop calling `bannerCustomEventWillBeginAction:` to fix a freezing issue in Unity games.
+
+ * 6.2.0.0.0
+    * This version of the adapters has been certified with Mintegral 6.2.0.0 and MoPub 5.12.1.
+
  * 6.1.2.0.1
     * MoPub now collects GDPR consent on behalf of Mintegral.
 

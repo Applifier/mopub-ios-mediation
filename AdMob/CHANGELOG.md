@@ -1,4 +1,30 @@
 ## Changelog
+  * 7.62.0.0
+    * This version of the adapters has been certified with AdMob 7.62.0 and MoPub 5.13.1.
+
+  * 7.61.0.1
+    * Remove i386 architecture support for iPhone simulators.
+
+  * 7.61.0.0
+    * This version of the adapters has been certified with AdMob 7.61.0 and MoPub 5.13.0.
+
+  * 7.60.0.0
+    * This version of the adapters has been certified with AdMob 7.60.0 and MoPub 5.13.0.
+
+  * 7.59.0.1
+    * Refactor non-native adapter classes to use the new consolidated API from MoPub.
+    * Remove banner size mapping checks to fully take advantage of adaptive banner.
+    * To use this and newer adapter versions, you must use MoPub 5.13.0 or newer.
+    
+  * 7.59.0.0
+    * This version of the adapters has been certified with AdMob 7.59.0 and MoPub 5.12.1.
+
+  * 7.58.0.1
+    * Redefine valid architectures.
+
+  * 7.58.0.0
+    * This version of the adapters has been certified with AdMob 7.58.0 and MoPub 5.12.1.
+
   * 7.57.0.0
     * This version of the adapters has been certified with AdMob 7.57.0 and MoPub 5.11.0.
 
