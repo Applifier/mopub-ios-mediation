@@ -43,6 +43,9 @@ static NSString *const kUnityAdsOptionZoneIdKey = @"zoneId";
 
 - (BOOL)hasAdAvailable
 {
+    if (self.useHeaderBidding) {
+        return [[UnityRouter sharedRouter] isAdAvailableForPlacementId:self.placementId] && self.bidLoaded;
+    }
     return [[UnityRouter sharedRouter] isAdAvailableForPlacementId:self.placementId];
 }
 
@@ -72,7 +75,7 @@ static NSString *const kUnityAdsOptionZoneIdKey = @"zoneId";
         self.useHeaderBidding = YES;
         self.uuid = [[NSUUID UUID] UUIDString];
         self.bidLoaded = NO;
-        [UnityAds addDelegate:self];
+        [UnityAds addDelegate:(id)self];
         [UnityAds loadBid:self.uuid placement:self.placementId bid:adMarkup];
     }
     
@@ -89,14 +92,6 @@ static NSString *const kUnityAdsOptionZoneIdKey = @"zoneId";
                                };
     
     return [NSError errorWithDomain:NSStringFromClass([self class]) code:0 userInfo:userInfo];
-}
-
-- (BOOL)hasAdAvailable
-{
-    if (self.useHeaderBidding) {
-        return [[UnityRouter sharedRouter] isAdAvailableForPlacementId:self.placementId] && self.bidLoaded;
-    }
-    return [[UnityRouter sharedRouter] isAdAvailableForPlacementId:self.placementId];
 }
 
 - (void)presentAdFromViewController:(UIViewController *)viewController
@@ -205,7 +200,7 @@ static NSString *const kUnityAdsOptionZoneIdKey = @"zoneId";
 
 - (void)unityAdsBidFailedToLoad:(NSString*)uuid {
     if ([self.uuid isEqualToString:uuid]) {
-        [UnityAds removeDelegate:self];
+        [UnityAds removeDelegate:(id)self];
         self.bidLoaded = NO;
         
         if (self.loadRequested) {
@@ -213,8 +208,7 @@ static NSString *const kUnityAdsOptionZoneIdKey = @"zoneId";
                 andReason:@"There is no available video ad."
             andSuggestion:@""];
             
-            
-            [self.delegate interstitialCustomEvent:self didFailToLoadAdWithError:error];
+            [self.delegate fullscreenAdAdapter:self didFailToLoadAdWithError:error];
             MPLogAdEvent([MPLogEvent adLoadFailedForAdapter:NSStringFromClass(self.class) error:error], [self getAdNetworkId]);
             self.loadRequested = NO;
         }
@@ -223,11 +217,11 @@ static NSString *const kUnityAdsOptionZoneIdKey = @"zoneId";
 
 - (void)unityAdsBidLoaded:(NSString*)uuid {
     if ([self.uuid isEqualToString:uuid]) {
-        [UnityAds removeDelegate:self];
+        [UnityAds removeDelegate:(id)self];
         self.bidLoaded = YES;
         
         if (self.loadRequested) {
-            [self.delegate interstitialCustomEvent:self didLoadAd:self.placementId];
+            [self.delegate fullscreenAdAdapterDidLoadAd:self];
             MPLogAdEvent([MPLogEvent adLoadSuccessForAdapter:NSStringFromClass(self.class)], [self getAdNetworkId]);
             self.loadRequested = NO;
         }
