@@ -64,7 +64,15 @@ static NSString *const kUnityAdsOptionZoneIdKey = @"zoneId";
     if (![UnityAds isInitialized]) {
         [[UnityRouter sharedRouter] initializeWithGameId:gameId withCompletionHandler:nil];
     }
-    [UnityAds load:self.placementId loadDelegate:self];
+    
+    UADSLoadOptions *options = [UADSLoadOptions new];
+    if (adMarkup != nil)
+    {
+        [options setObjectId:[[NSUUID UUID] UUIDString]];
+        [options setAdMarkup:adMarkup];
+    }
+    
+    [UnityAds load:self.placementId options:options loadDelegate:self];
     MPLogAdEvent([MPLogEvent adLoadAttemptForAdapter:NSStringFromClass(self.class) dspCreativeId:nil dspName:nil], [self getAdNetworkId]);
 }
 
