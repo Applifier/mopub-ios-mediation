@@ -55,6 +55,9 @@ static NSString *const kUnityAdsOptionZoneIdKey = @"zoneId";
 - (void)requestAdWithAdapterInfo:(NSDictionary *)info adMarkup:(NSString *)adMarkup
 {
     NSString *gameId = [info objectForKey:kMPUnityRewardedVideoGameId];
+    
+    NSLog(@"Request ad with adapter info with gameId %@", gameId);
+    
     if (gameId == nil) {
         NSError *error = [NSError errorWithDomain:MoPubRewardedVideoAdsSDKDomain code:MPRewardedVideoAdErrorInvalidCustomEvent userInfo:@{NSLocalizedDescriptionKey: @"Custom event class data did not contain gameId.", NSLocalizedRecoverySuggestionErrorKey: @"Update your MoPub custom event class data to contain a valid Unity Ads gameId."}];
 
@@ -82,12 +85,15 @@ static NSString *const kUnityAdsOptionZoneIdKey = @"zoneId";
     }
     
     UADSLoadOptions *options = [UADSLoadOptions new];
+    [options setObjectId:[[NSUUID UUID] UUIDString]];
+    
     if (adMarkup != nil)
     {
-        [options setObjectId:[[NSUUID UUID] UUIDString]];
         [options setAdMarkup:adMarkup];
+        NSLog(@"Also got AdMarkup %@", adMarkup);
     }
     
+    NSLog(@"Load ad");
     [UnityAds load:self.placementId options:options loadDelegate:self];
     MPLogAdEvent([MPLogEvent adLoadAttemptForAdapter:NSStringFromClass(self.class) dspCreativeId:nil dspName:nil], [self getAdNetworkId]);
 }
