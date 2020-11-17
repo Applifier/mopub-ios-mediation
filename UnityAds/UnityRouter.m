@@ -66,6 +66,10 @@
         [mediationMetaData setVersion:[[MoPub sharedInstance] version]];
         [mediationMetaData set:@"adapter_version"  value:ADAPTER_VERSION];
         [mediationMetaData commit];
+        
+        UADSMetaData *headerBiddingMeta = [[UADSMetaData alloc]initWithCategory:@"headerbidding"];
+        [headerBiddingMeta set:@"mode" value:@"enabled"];
+        [headerBiddingMeta commit];
     });
 
     UnityAdsAdapterInitializationDelegate *initDelegate = [[UnityAdsAdapterInitializationDelegate alloc] init];
@@ -81,7 +85,8 @@
         NSError *err = [NSError errorWithCode:(MOPUBErrorSDKNotInitialized) localizedDescription:message];
         complete(err);
     };
-        
+      
+//    [UnityAds setDebugMode:YES];
     [UnityAds initialize:gameId testMode:false enablePerPlacementLoad:true initializationDelegate:initDelegate];
 }
 

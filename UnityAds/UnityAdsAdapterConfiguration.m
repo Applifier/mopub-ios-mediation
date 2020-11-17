@@ -48,7 +48,9 @@ typedef NS_ENUM(NSInteger, UnityAdsAdapterErrorCode) {
 }
 
 - (NSString *)biddingToken {
-    return nil;
+    NSString *token = [UnityAds getToken];
+    NSLog(@"Requested token, %@", token);
+    return token;
 }
 
 - (NSString *)moPubNetworkName {
@@ -61,6 +63,9 @@ typedef NS_ENUM(NSInteger, UnityAdsAdapterErrorCode) {
 
 - (void)initializeNetworkWithConfiguration:(NSDictionary<NSString *, id> *)configuration
                                   complete:(void(^)(NSError *))complete {
+    
+    NSLog(@"config: %@", configuration);
+    
     NSString * gameId = configuration[kUnityAdsGameId];
     if (gameId == nil) {
         NSError * error = [NSError errorWithDomain:kAdapterErrorDomain code:UnityAdsAdapterErrorCodeMissingGameId userInfo:@{ NSLocalizedDescriptionKey: @"Unity Ads initialization skipped. The gameId is empty. Ensure it is properly configured on the MoPub dashboard." }];
