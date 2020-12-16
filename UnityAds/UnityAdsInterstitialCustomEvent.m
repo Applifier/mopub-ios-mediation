@@ -20,6 +20,7 @@ static NSString *const kUnityAdsOptionZoneIdKey = @"zoneId";
 @interface UnityAdsInterstitialCustomEvent () <UnityAdsLoadDelegate, UnityAdsExtendedDelegate>
 
 @property (nonatomic, copy) NSString *placementId;
+@property (nonatomic) NSString *objectId;
 
 @end
 
@@ -74,7 +75,18 @@ static NSString *const kUnityAdsOptionZoneIdKey = @"zoneId";
         return;
     }
     
-    [UnityAds load:self.placementId loadDelegate:self];
+    if (adMarkup != nil) {
+        _objectId = [[NSUUID UUID] UUIDString];
+        
+        UADSLoadOptions *options = [UADSLoadOptions new];
+        [options setObjectId:_objectId];
+        [options setAdMarkup:adMarkup];
+        
+        [UnityAds load:self.placementId options:options loadDelegate:self];
+    } else {
+        [UnityAds load:self.placementId loadDelegate:self];
+    }
+    
     MPLogAdEvent([MPLogEvent adLoadAttemptForAdapter:NSStringFromClass(self.class) dspCreativeId:nil dspName:nil], [self getAdNetworkId]);
 }
 
@@ -93,7 +105,15 @@ static NSString *const kUnityAdsOptionZoneIdKey = @"zoneId";
     if ([self hasAdAvailable]) {
         MPLogAdEvent([MPLogEvent adShowAttemptForAdapter:NSStringFromClass(self.class)], [self getAdNetworkId]);
         [UnityAds addDelegate:self];
-        [UnityAds show:viewController placementId:_placementId];
+        
+        if (_objectId != nil) {
+            UADSShowOptions *options = [UADSShowOptions new];
+            [options setObjectId:_objectId];
+            
+            [UnityAds show:viewController placementId:_placementId options:options];
+        } else {
+            [UnityAds show:viewController placementId:_placementId];
+        }
     } else {
         NSError *error = [self createErrorWith:@"Unity Ads failed to show interstitial"
                                      andReason:@"There is no available interstitial ad."

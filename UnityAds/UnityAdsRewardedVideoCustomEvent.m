@@ -22,6 +22,7 @@ static NSString *const kUnityAdsOptionZoneIdKey = @"zoneId";
 @interface UnityAdsRewardedVideoCustomEvent () <UnityAdsLoadDelegate, UnityAdsExtendedDelegate>
 
 @property (nonatomic, copy) NSString *placementId;
+@property (nonatomic) NSString *objectId;
 
 @end
 
@@ -91,7 +92,17 @@ static NSString *const kUnityAdsOptionZoneIdKey = @"zoneId";
     }
     
     MPLogAdEvent([MPLogEvent adLoadAttemptForAdapter:NSStringFromClass(self.class) dspCreativeId:nil dspName:nil], [self getAdNetworkId]);
-    [UnityAds load:self.placementId loadDelegate:self];
+    
+    if (adMarkup != nil) {
+        UADSLoadOptions *options = [UADSLoadOptions new];
+        _objectId = [[NSUUID UUID] UUIDString];
+        [options setObjectId:_objectId];
+        [options setAdMarkup:adMarkup];
+        
+        [UnityAds load:self.placementId options:options loadDelegate:self];
+    } else {
+        [UnityAds load:self.placementId loadDelegate:self];
+    }
 }
 
 - (void)presentAdFromViewController:(UIViewController *)viewController
@@ -99,7 +110,14 @@ static NSString *const kUnityAdsOptionZoneIdKey = @"zoneId";
     if ([self hasAdAvailable]) {
         MPLogAdEvent([MPLogEvent adShowAttemptForAdapter:NSStringFromClass(self.class)], [self getAdNetworkId]);
         [UnityAds addDelegate:self];
-        [UnityAds show:viewController placementId:_placementId];
+        if (_objectId != nil) {
+            UADSShowOptions *options = [UADSShowOptions new];
+            [options setObjectId:_objectId];
+            
+            [UnityAds show:viewController placementId:_placementId options:options];
+        } else {
+            [UnityAds show:viewController placementId:_placementId];
+        }
     } else {
         NSError *error = [NSError errorWithDomain:MoPubRewardedVideoAdsSDKDomain code:MPRewardedVideoAdErrorNoAdsAvailable userInfo:nil];
         MPLogAdEvent([MPLogEvent adLoadFailedForAdapter:NSStringFromClass(self.class) error:error], [self getAdNetworkId]);

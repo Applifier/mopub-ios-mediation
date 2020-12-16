@@ -48,7 +48,7 @@ typedef NS_ENUM(NSInteger, UnityAdsAdapterErrorCode) {
 }
 
 - (NSString *)biddingToken {
-    return nil;
+    return [UnityAds getToken];
 }
 
 - (NSString *)moPubNetworkName {
