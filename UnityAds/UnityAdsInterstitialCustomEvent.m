@@ -28,6 +28,8 @@ static NSString *const kUnityAdsOptionZoneIdKey = @"zoneId";
 @dynamic delegate;
 @dynamic localExtras;
 @dynamic hasAdAvailable;
+int impressionOrdinal;
+int missedImpressionOrdinal;
 
 #pragma mark - MPFullscreenAdAdapter Override
 
@@ -102,7 +104,7 @@ static NSString *const kUnityAdsOptionZoneIdKey = @"zoneId";
 
 - (void)presentAdFromViewController:(UIViewController *)viewController
 {
-    if ([self hasAdAvailable]) {
+    if ([UnityAds isReady:_placementId]) {
         MPLogAdEvent([MPLogEvent adShowAttemptForAdapter:NSStringFromClass(self.class)], [self getAdNetworkId]);
         [UnityAds addDelegate:self];
         
@@ -138,6 +140,7 @@ static NSString *const kUnityAdsOptionZoneIdKey = @"zoneId";
     if (![self hasAdAvailable]) {
         MPLogInfo(@"Unity Ads interstitial has expired");
         [self.delegate fullscreenAdAdapterDidExpire:self];
+        MPLogAdEvent([MPLogEvent adExpiredWithTimeInterval:0], [self getAdNetworkId]);
     }
 }
 
@@ -224,6 +227,32 @@ static NSString *const kUnityAdsOptionZoneIdKey = @"zoneId";
                                  andSuggestion:@""];
     MPLogAdEvent([MPLogEvent adLoadFailedForAdapter:NSStringFromClass(self.class) error:errorLoad], [self getAdNetworkId]);
     [self.delegate fullscreenAdAdapter:self didFailToLoadAdWithError:errorLoad];
+}
+
+- (void)unityAdsAdLoaded:(NSString *)placementId {
+    [self.delegate fullscreenAdAdapterDidLoadAd:self];
+    MPLogAdEvent([MPLogEvent adLoadSuccessForAdapter:NSStringFromClass(self.class)], [self getAdNetworkId]);
+    [self sendMetadataAdShownCorrect:YES];
+}
+
+- (void)unityAdsAdFailedToLoad:(nonnull NSString *)placementId {
+    NSError *errorLoad = [self createErrorWith:@"Unity Ads failed to load an ad"
+                                 andReason:@""
+                             andSuggestion:@""];
+    [self.delegate fullscreenAdAdapter:self didFailToLoadAdWithError:errorLoad];
+    MPLogAdEvent([MPLogEvent adLoadFailedForAdapter:NSStringFromClass(self.class) error:errorLoad], [self getAdNetworkId]);
+    [self sendMetadataAdShownCorrect:NO];
+}
+
+- (void) sendMetadataAdShownCorrect: (BOOL) isAdShown {
+    UADSMediationMetaData *headerBiddingMeta = [[UADSMediationMetaData alloc]initWithCategory:@"mediation"];
+    if(isAdShown) {
+        [headerBiddingMeta setOrdinal: ++impressionOrdinal];
+    }
+    else {
+        [headerBiddingMeta setMissedImpressionOrdinal: ++missedImpressionOrdinal];
+    }
+    [headerBiddingMeta commit];
 }
 
 @end
