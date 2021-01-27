@@ -17,7 +17,7 @@ static NSString *const kMPUnityInterstitialVideoGameId = @"gameId";
 static NSString *const kUnityAdsOptionPlacementIdKey = @"placementId";
 static NSString *const kUnityAdsOptionZoneIdKey = @"zoneId";
 
-@interface UnityAdsInterstitialCustomEvent () <UnityAdsLoadDelegate, UnityAdsExtendedDelegate>
+@interface UnityAdsInterstitialCustomEvent () <UnityAdsLoadDelegate, UnityAdsShowDelegate>
 
 @property (nonatomic, copy) NSString *placementId;
 
@@ -92,8 +92,7 @@ static NSString *const kUnityAdsOptionZoneIdKey = @"zoneId";
 {
     if ([self hasAdAvailable]) {
         MPLogAdEvent([MPLogEvent adShowAttemptForAdapter:NSStringFromClass(self.class)], [self getAdNetworkId]);
-        [UnityAds addDelegate:self];
-        [UnityAds show:viewController placementId:_placementId];
+        [UnityAds show:viewController placementId:_placementId showDelegate:self];
     } else {
         NSError *error = [self createErrorWith:@"Unity Ads failed to show interstitial"
                                      andReason:@"There is no available interstitial ad."
@@ -106,7 +105,7 @@ static NSString *const kUnityAdsOptionZoneIdKey = @"zoneId";
 
 - (void)handleDidInvalidateAd
 {
-    [UnityAds removeDelegate:self];
+  // Nothing to clean up.
 }
 
 /// This callback is used for expiration, please see here: https://developers.mopub.com/networks/integrate/build-adapters-ios/#quick-start-for-fullscreen-ads
@@ -126,72 +125,7 @@ static NSString *const kUnityAdsOptionZoneIdKey = @"zoneId";
     return NO;
 }
 
-#pragma mark - UnityRouterDelegate
-
-- (void)unityAdsReady:(NSString *)placementId
-{
-    // No-op
-}
-
-/// This method only handles show-related errors. Load-related errors are handled by unityAdsAdFailedToLoad.
-- (void)unityAdsDidError:(UnityAdsError)error withMessage:(NSString *)message
-{
-    [UnityAds removeDelegate:self];
-    
-    if (error == kUnityAdsErrorShowError) {
-      NSError *showError= [self createErrorWith:@"Unity Ads failed to show interstitial"
-                                      andReason:message
-                                  andSuggestion:@""];
-        MPLogAdEvent([MPLogEvent adShowFailedForAdapter:NSStringFromClass(self.class) error:showError], [self getAdNetworkId]);
-        [self.delegate fullscreenAdAdapter:self didFailToShowAdWithError:showError];
-    } else {
-        NSError *otherError= [self createErrorWith:@"Unity Ads interstitial failure"
-                                           andReason:message
-                                       andSuggestion:@""];
-        MPLogAdEvent([MPLogEvent adShowFailedForAdapter:NSStringFromClass(self.class) error:otherError], [self getAdNetworkId]);
-        [self.delegate fullscreenAdAdapter:self didFailToShowAdWithError:otherError];
-    }
-}
-
-- (void) unityAdsDidStart:(NSString *)placementId
-{
-    [self.delegate fullscreenAdAdapterAdWillAppear:self];
-    MPLogAdEvent([MPLogEvent adWillAppearForAdapter:NSStringFromClass(self.class)], [self getAdNetworkId]);
-    MPLogAdEvent([MPLogEvent adShowSuccessForAdapter:NSStringFromClass(self.class)], [self getAdNetworkId]);
-
-    [self.delegate fullscreenAdAdapterAdDidAppear:self];
-    [self.delegate fullscreenAdAdapterDidTrackImpression:self];
-    MPLogAdEvent([MPLogEvent adDidAppearForAdapter:NSStringFromClass(self.class)], [self getAdNetworkId]);
-}
-
-- (void) unityAdsDidFinish:(NSString *)placementId withFinishState:(UnityAdsFinishState)state
-{
-    [UnityAds removeDelegate:self];
-    [self.delegate fullscreenAdAdapterAdWillDisappear:self];
-    MPLogAdEvent([MPLogEvent adWillDisappearForAdapter:NSStringFromClass(self.class)], [self getAdNetworkId]);
-
-    [self.delegate fullscreenAdAdapterAdDidDisappear:self];
-    MPLogAdEvent([MPLogEvent adDidDisappearForAdapter:NSStringFromClass(self.class)], [self getAdNetworkId]);
-    
-    // Signal that the fullscreen ad is closing and the state should be reset.
-    // `fullscreenAdAdapterAdDidDismiss:` was introduced in MoPub SDK 5.15.0.
-    if ([self.delegate respondsToSelector:@selector(fullscreenAdAdapterAdDidDismiss:)]) {
-        [self.delegate fullscreenAdAdapterAdDidDismiss:self];
-    }
-}
-
-- (void) unityAdsDidClick:(NSString *)placementId
-{
-    MPLogAdEvent([MPLogEvent adTappedForAdapter:NSStringFromClass(self.class)], [self getAdNetworkId]);
-    [self.delegate fullscreenAdAdapterDidReceiveTap:self];
-    [self.delegate fullscreenAdAdapterDidTrackClick:self];
-    MPLogAdEvent([MPLogEvent adWillLeaveApplicationForAdapter:NSStringFromClass(self.class)], [self getAdNetworkId]);
-    [self.delegate fullscreenAdAdapterWillLeaveApplication:self];
-}
-
-- (void)unityAdsPlacementStateChanged:(nonnull NSString *)placementId oldState:(UnityAdsPlacementState)oldState newState:(UnityAdsPlacementState)newState {
-    // no-op
-}
+#pragma mark - UnityAdsLoadDelegate Methods
 
 - (void)unityAdsAdLoaded:(NSString *)placementId {
     [self.delegate fullscreenAdAdapterDidLoadAd:self];
@@ -204,6 +138,57 @@ static NSString *const kUnityAdsOptionZoneIdKey = @"zoneId";
                                  andSuggestion:@""];
     MPLogAdEvent([MPLogEvent adLoadFailedForAdapter:NSStringFromClass(self.class) error:errorLoad], [self getAdNetworkId]);
     [self.delegate fullscreenAdAdapter:self didFailToLoadAdWithError:errorLoad];
+}
+
+#pragma mark - UnityAdsShowDelegate Methods
+
+- (void)unityAdsShowClick:(NSString *)placementId {
+  MPLogAdEvent([MPLogEvent adTappedForAdapter:NSStringFromClass(self.class)], [self getAdNetworkId]);
+  [self.delegate fullscreenAdAdapterDidReceiveTap:self];
+  [self.delegate fullscreenAdAdapterDidTrackClick:self];
+  MPLogAdEvent([MPLogEvent adWillLeaveApplicationForAdapter:NSStringFromClass(self.class)], [self getAdNetworkId]);
+  [self.delegate fullscreenAdAdapterWillLeaveApplication:self];
+}
+
+- (void)unityAdsShowComplete:(NSString *)placementId withFinishState:(UnityAdsShowCompletionState)state {
+  [self.delegate fullscreenAdAdapterAdWillDisappear:self];
+  MPLogAdEvent([MPLogEvent adWillDisappearForAdapter:NSStringFromClass(self.class)], [self getAdNetworkId]);
+
+  [self.delegate fullscreenAdAdapterAdDidDisappear:self];
+  MPLogAdEvent([MPLogEvent adDidDisappearForAdapter:NSStringFromClass(self.class)], [self getAdNetworkId]);
+
+  // Signal that the fullscreen ad is closing and the state should be reset.
+  // `fullscreenAdAdapterAdDidDismiss:` was introduced in MoPub SDK 5.15.0.
+  if ([self.delegate respondsToSelector:@selector(fullscreenAdAdapterAdDidDismiss:)]) {
+      [self.delegate fullscreenAdAdapterAdDidDismiss:self];
+  }
+}
+
+- (void)unityAdsShowFailed:(NSString *)placementId withError:(UnityAdsShowError)error withMessage:(NSString *)message {
+
+  if (error == kUnityAdsErrorShowError) {
+    NSError *showError= [self createErrorWith:@"Unity Ads failed to show interstitial"
+                                    andReason:message
+                                andSuggestion:@""];
+      MPLogAdEvent([MPLogEvent adShowFailedForAdapter:NSStringFromClass(self.class) error:showError], [self getAdNetworkId]);
+      [self.delegate fullscreenAdAdapter:self didFailToShowAdWithError:showError];
+  } else {
+      NSError *otherError= [self createErrorWith:@"Unity Ads interstitial failure"
+                                         andReason:message
+                                     andSuggestion:@""];
+      MPLogAdEvent([MPLogEvent adShowFailedForAdapter:NSStringFromClass(self.class) error:otherError], [self getAdNetworkId]);
+      [self.delegate fullscreenAdAdapter:self didFailToShowAdWithError:otherError];
+  }
+}
+
+- (void)unityAdsShowStart:(nonnull NSString *)placementId {
+  [self.delegate fullscreenAdAdapterAdWillAppear:self];
+  MPLogAdEvent([MPLogEvent adWillAppearForAdapter:NSStringFromClass(self.class)], [self getAdNetworkId]);
+  MPLogAdEvent([MPLogEvent adShowSuccessForAdapter:NSStringFromClass(self.class)], [self getAdNetworkId]);
+
+  [self.delegate fullscreenAdAdapterAdDidAppear:self];
+  [self.delegate fullscreenAdAdapterDidTrackImpression:self];
+  MPLogAdEvent([MPLogEvent adDidAppearForAdapter:NSStringFromClass(self.class)], [self getAdNetworkId]);
 }
 
 @end
