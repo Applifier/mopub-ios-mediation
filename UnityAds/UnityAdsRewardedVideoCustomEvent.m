@@ -19,12 +19,6 @@ static NSString *const kMPUnityRewardedVideoGameId = @"gameId";
 static NSString *const kUnityAdsOptionPlacementIdKey = @"placementId";
 static NSString *const kUnityAdsOptionZoneIdKey = @"zoneId";
 
-//Constants for metadata keys to inform if ad was shown or not
-static NSString *const kUnityMediationOrdinalKey = @"ordinal";
-static NSString *const kUnityMediationMissedImpressionOrdinalKey = @"missedImpressionOrdinal";
-static NSString *const kUnityMediationNetworkNameKey = @"name";
-static NSString *const kUnityMediationNetworkSDKVersionKey = @"version";
-
 @interface UnityAdsRewardedVideoCustomEvent () <UnityAdsLoadDelegate, UnityAdsExtendedDelegate>
 
 @property (nonatomic, copy) NSString *placementId;
