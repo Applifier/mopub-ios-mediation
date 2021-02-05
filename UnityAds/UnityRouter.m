@@ -67,6 +67,9 @@
         [mediationMetaData set:@"adapter_version"  value:ADAPTER_VERSION];
         [mediationMetaData commit];
         
+        UADSMetaData *headerBiddingMeta = [[UADSMetaData alloc]initWithCategory:@"headerbidding"];
+                [headerBiddingMeta set:@"mode" value:@"enabled"];
+                [headerBiddingMeta commit];
         
         UnityAdsAdapterInitializationDelegate *initDelegate = [[UnityAdsAdapterInitializationDelegate alloc] init];
         
