@@ -21,6 +21,8 @@ static NSString *const kUnityAdsOptionZoneIdKey = @"zoneId";
 
 @property (nonatomic, copy) NSString *placementId;
 @property (nonatomic) NSString *objectId;
+@property (nonatomic) int impressionOrdinal;
+@property (nonatomic) int missedImpressionOrdinal;
 
 @end
 
@@ -216,6 +218,7 @@ static NSString *const kUnityAdsOptionZoneIdKey = @"zoneId";
 - (void)unityAdsAdLoaded:(NSString *)placementId {
     [self.delegate fullscreenAdAdapterDidLoadAd:self];
     MPLogAdEvent([MPLogEvent adLoadSuccessForAdapter:NSStringFromClass(self.class)], [self getAdNetworkId]);
+    [self sendMetadataAdShownCorrect:YES];
 }
 
 - (void)unityAdsAdFailedToLoad:(nonnull NSString *)placementId {
@@ -224,6 +227,18 @@ static NSString *const kUnityAdsOptionZoneIdKey = @"zoneId";
                                  andSuggestion:@""];
     MPLogAdEvent([MPLogEvent adLoadFailedForAdapter:NSStringFromClass(self.class) error:errorLoad], [self getAdNetworkId]);
     [self.delegate fullscreenAdAdapter:self didFailToLoadAdWithError:errorLoad];
+    [self sendMetadataAdShownCorrect:NO];
+}
+
+- (void) sendMetadataAdShownCorrect: (BOOL) isAdShown {
+    UADSMediationMetaData *headerBiddingMeta = [[UADSMediationMetaData alloc]initWithCategory:@"mediation"];
+    if(isAdShown) {
+        [headerBiddingMeta setOrdinal: ++_impressionOrdinal];
+    }
+    else {
+        [headerBiddingMeta setMissedImpressionOrdinal: ++_missedImpressionOrdinal];
+    }
+    [headerBiddingMeta commit];
 }
 
 @end

@@ -23,7 +23,8 @@ static NSString *const kUnityAdsOptionZoneIdKey = @"zoneId";
 
 @property (nonatomic, copy) NSString *placementId;
 @property (nonatomic) NSString *objectId;
-
+@property (nonatomic) int impressionOrdinal;
+@property (nonatomic) int missedImpressionOrdinal;
 @end
 
 @implementation UnityAdsRewardedVideoCustomEvent
@@ -223,11 +224,26 @@ static NSString *const kUnityAdsOptionZoneIdKey = @"zoneId";
     NSError *error = [NSError errorWithDomain:MoPubRewardedVideoAdsSDKDomain code:MPRewardedVideoAdErrorUnknown userInfo:nil];
     MPLogAdEvent([MPLogEvent adLoadFailedForAdapter:NSStringFromClass(self.class) error:error], [self getAdNetworkId]);
      [self.delegate fullscreenAdAdapter:self didFailToLoadAdWithError:error];
+    [self sendMetadataAdShownCorrect:NO];
 }
 
 - (void)unityAdsAdLoaded:(nonnull NSString *)placementId {
     MPLogAdEvent([MPLogEvent adLoadSuccessForAdapter:NSStringFromClass(self.class)], [self getAdNetworkId]);
     [self.delegate fullscreenAdAdapterDidLoadAd:self];
+    [self sendMetadataAdShownCorrect:YES];
 }
+
+
+- (void) sendMetadataAdShownCorrect: (BOOL) isAdShown {
+    UADSMediationMetaData *headerBiddingMeta = [[UADSMediationMetaData alloc]initWithCategory:@"mediation"];
+    if(isAdShown) {
+        [headerBiddingMeta setOrdinal: ++_impressionOrdinal];
+    }
+    else {
+        [headerBiddingMeta setMissedImpressionOrdinal: ++_missedImpressionOrdinal];
+    }
+    [headerBiddingMeta commit];
+}
+
 
 @end
