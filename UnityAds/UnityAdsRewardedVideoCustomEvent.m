@@ -31,8 +31,6 @@ static NSString *const kUnityAdsOptionZoneIdKey = @"zoneId";
 @dynamic delegate;
 @dynamic localExtras;
 @dynamic hasAdAvailable;
-int impressionOrdinal;
-int missedImpressionOrdinal;
 
 - (void)initializeSdkWithParameters:(NSDictionary *)parameters {
     NSString *gameId = [parameters objectForKey:kMPUnityRewardedVideoGameId];

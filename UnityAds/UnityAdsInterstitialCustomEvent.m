@@ -30,8 +30,6 @@ static NSString *const kUnityAdsOptionZoneIdKey = @"zoneId";
 @dynamic delegate;
 @dynamic localExtras;
 @dynamic hasAdAvailable;
-int impressionOrdinal;
-int missedImpressionOrdinal;
 
 #pragma mark - MPFullscreenAdAdapter Override
 
@@ -236,10 +234,10 @@ int missedImpressionOrdinal;
 - (void) sendMetadataAdShownCorrect: (BOOL) isAdShown {
     UADSMediationMetaData *headerBiddingMeta = [[UADSMediationMetaData alloc]initWithCategory:@"mediation"];
     if(isAdShown) {
-        [headerBiddingMeta setOrdinal: ++impressionOrdinal];
+        [headerBiddingMeta setOrdinal: ++_impressionOrdinal];
     }
     else {
-        [headerBiddingMeta setMissedImpressionOrdinal: ++missedImpressionOrdinal];
+        [headerBiddingMeta setMissedImpressionOrdinal: ++_missedImpressionOrdinal];
     }
     [headerBiddingMeta commit];
 }
