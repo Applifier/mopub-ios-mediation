@@ -122,9 +122,6 @@ int missedImpressionOrdinal;
         } else {
             [UnityAds show:viewController placementId:_placementId];
         }
-        MediationME *gdprConsentMetaData = [[UADSMetaData alloc] init];
-         [gdprConsentMetaData ];
-         [gdprConsentMetaData commit];
     } else {
         NSError *error = [NSError errorWithDomain:MoPubRewardedVideoAdsSDKDomain code:MPRewardedVideoAdErrorNoAdsAvailable userInfo:nil];
         MPLogAdEvent([MPLogEvent adLoadFailedForAdapter:NSStringFromClass(self.class) error:error], [self getAdNetworkId]);
