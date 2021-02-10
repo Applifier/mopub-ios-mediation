@@ -31,6 +31,8 @@ static NSString *const kUnityAdsOptionZoneIdKey = @"zoneId";
 @dynamic delegate;
 @dynamic localExtras;
 @dynamic hasAdAvailable;
+int impressionOrdinal;
+int missedImpressionOrdinal;
 
 - (void)initializeSdkWithParameters:(NSDictionary *)parameters {
     NSString *gameId = [parameters objectForKey:kMPUnityRewardedVideoGameId];
@@ -60,6 +62,7 @@ static NSString *const kUnityAdsOptionZoneIdKey = @"zoneId";
 - (void)requestAdWithAdapterInfo:(NSDictionary *)info adMarkup:(NSString *)adMarkup
 {
     NSString *gameId = [info objectForKey:kMPUnityRewardedVideoGameId];
+    
     if (gameId == nil) {
         NSError *error = [NSError errorWithDomain:MoPubRewardedVideoAdsSDKDomain code:MPRewardedVideoAdErrorInvalidCustomEvent userInfo:@{NSLocalizedDescriptionKey: @"Custom event class data did not contain gameId.", NSLocalizedRecoverySuggestionErrorKey: @"Update your MoPub custom event class data to contain a valid Unity Ads gameId."}];
 
@@ -119,6 +122,9 @@ static NSString *const kUnityAdsOptionZoneIdKey = @"zoneId";
         } else {
             [UnityAds show:viewController placementId:_placementId];
         }
+        MediationME *gdprConsentMetaData = [[UADSMetaData alloc] init];
+         [gdprConsentMetaData ];
+         [gdprConsentMetaData commit];
     } else {
         NSError *error = [NSError errorWithDomain:MoPubRewardedVideoAdsSDKDomain code:MPRewardedVideoAdErrorNoAdsAvailable userInfo:nil];
         MPLogAdEvent([MPLogEvent adLoadFailedForAdapter:NSStringFromClass(self.class) error:error], [self getAdNetworkId]);
@@ -232,7 +238,6 @@ static NSString *const kUnityAdsOptionZoneIdKey = @"zoneId";
     [self.delegate fullscreenAdAdapterDidLoadAd:self];
     [self sendMetadataAdShownCorrect:YES];
 }
-
 
 - (void) sendMetadataAdShownCorrect: (BOOL) isAdShown {
     UADSMediationMetaData *headerBiddingMeta = [[UADSMediationMetaData alloc]initWithCategory:@"mediation"];
