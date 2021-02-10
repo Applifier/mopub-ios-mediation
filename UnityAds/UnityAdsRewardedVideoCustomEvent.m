@@ -23,9 +23,8 @@ static NSString *const kUnityAdsOptionZoneIdKey = @"zoneId";
 
 @property (nonatomic, copy) NSString *placementId;
 @property (nonatomic) NSString *objectId;
-
-@property
-
+@property (nonatomic) int impressionOrdinal;
+@property (nonatomic) int missedImpressionOrdinal;
 @end
 
 @implementation UnityAdsRewardedVideoCustomEvent
@@ -231,33 +230,22 @@ int missedImpressionOrdinal;
     NSError *error = [NSError errorWithDomain:MoPubRewardedVideoAdsSDKDomain code:MPRewardedVideoAdErrorUnknown userInfo:nil];
     MPLogAdEvent([MPLogEvent adLoadFailedForAdapter:NSStringFromClass(self.class) error:error], [self getAdNetworkId]);
      [self.delegate fullscreenAdAdapter:self didFailToLoadAdWithError:error];
-}
-
-- (void)unityAdsAdLoaded:(nonnull NSString *)placementId {
-    MPLogAdEvent([MPLogEvent adLoadSuccessForAdapter:NSStringFromClass(self.class)], [self getAdNetworkId]);
-    [self.delegate fullscreenAdAdapterDidLoadAd:self];
-}
-
-- (void)unityAdsAdFailedToLoad:(nonnull NSString *)placementId {
-    NSError *error = [NSError errorWithDomain:MoPubRewardedVideoAdsSDKDomain code:MPRewardedVideoAdErrorUnknown userInfo:nil];
-     [self.delegate fullscreenAdAdapter:self didFailToLoadAdWithError:error];
-     MPLogAdEvent([MPLogEvent adLoadFailedForAdapter:NSStringFromClass(self.class) error:error], [self getAdNetworkId]);
     [self sendMetadataAdShownCorrect:NO];
 }
 
 - (void)unityAdsAdLoaded:(nonnull NSString *)placementId {
-    [self.delegate fullscreenAdAdapterDidLoadAd:self];
     MPLogAdEvent([MPLogEvent adLoadSuccessForAdapter:NSStringFromClass(self.class)], [self getAdNetworkId]);
+    [self.delegate fullscreenAdAdapterDidLoadAd:self];
     [self sendMetadataAdShownCorrect:YES];
 }
 
 - (void) sendMetadataAdShownCorrect: (BOOL) isAdShown {
     UADSMediationMetaData *headerBiddingMeta = [[UADSMediationMetaData alloc]initWithCategory:@"mediation"];
     if(isAdShown) {
-        [headerBiddingMeta setOrdinal: ++impressionOrdinal];
+        [headerBiddingMeta setOrdinal: ++_impressionOrdinal];
     }
     else {
-        [headerBiddingMeta setMissedImpressionOrdinal: ++missedImpressionOrdinal];
+        [headerBiddingMeta setMissedImpressionOrdinal: ++_missedImpressionOrdinal];
     }
     [headerBiddingMeta commit];
 }
