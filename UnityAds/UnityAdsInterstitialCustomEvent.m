@@ -134,7 +134,7 @@ static NSString *const kUnityAdsOptionZoneIdKey = @"zoneId";
 
 - (void)unityAdsAdFailedToLoad:(nonnull NSString *)placementId withError:(UnityAdsLoadError)error withMessage:(NSString *)message {
     NSError *errorLoad = [self createErrorWith:@"Unity Ads failed to load interstitial ad"
-                                     andReason:@""
+                                     andReason:message
                                  andSuggestion:@""];
     MPLogAdEvent([MPLogEvent adLoadFailedForAdapter:NSStringFromClass(self.class) error:errorLoad], [self getAdNetworkId]);
     [self.delegate fullscreenAdAdapter:self didFailToLoadAdWithError:errorLoad];

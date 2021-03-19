@@ -131,9 +131,11 @@ static NSString *const kUnityAdsOptionZoneIdKey = @"zoneId";
 #pragma mark - UnityAdsLoadDelegate Methods
 
 - (void)unityAdsAdFailedToLoad:(nonnull NSString *)placementId withError:(UnityAdsLoadError)error withMessage:(NSString *)message {
-    NSError *mopubError = [NSError errorWithDomain:MoPubRewardedVideoAdsSDKDomain code:MPRewardedVideoAdErrorUnknown userInfo:nil];
-    MPLogAdEvent([MPLogEvent adLoadFailedForAdapter:NSStringFromClass(self.class) error:mopubError], [self getAdNetworkId]);
-     [self.delegate fullscreenAdAdapter:self didFailToLoadAdWithError:mopubError];
+    NSString* unityErrorMessage = [NSString stringWithFormat:@"Unity Ads failed to load a rewarded video ad for %@, with error message: %@", placementId, message];
+    NSError *loadError = [NSError errorWithDomain:MoPubRewardedVideoAdsSDKDomain code:MPRewardedVideoAdErrorUnknown userInfo:@{NSLocalizedDescriptionKey: unityErrorMessage}];
+
+    MPLogAdEvent([MPLogEvent adLoadFailedForAdapter:NSStringFromClass(self.class) error:loadError], [self getAdNetworkId]);
+    [self.delegate fullscreenAdAdapter:self didFailToLoadAdWithError:loadError];
 }
 
 - (void)unityAdsAdLoaded:(nonnull NSString *)placementId {
@@ -182,7 +184,7 @@ static NSString *const kUnityAdsOptionZoneIdKey = @"zoneId";
 
 - (void)unityAdsShowFailed:(NSString *)placementId withError:(UnityAdsShowError)error withMessage:(NSString *)message {
 
-    NSString* unityErrorMessage = [NSString stringWithFormat:@"Unity Ads failed to show a rewarded video ad for %@, with error message: %@", _placementId, message];
+    NSString* unityErrorMessage = [NSString stringWithFormat:@"Unity Ads failed to show a rewarded video ad for %@, with error message: %@", placementId, message];
     NSError *showError = [NSError errorWithDomain:MoPubRewardedVideoAdsSDKDomain code:MPRewardedVideoAdErrorUnknown userInfo:@{NSLocalizedDescriptionKey: unityErrorMessage}];
 
     MPLogAdEvent([MPLogEvent adLoadFailedForAdapter:NSStringFromClass(self.class) error:showError], [self getAdNetworkId]);
