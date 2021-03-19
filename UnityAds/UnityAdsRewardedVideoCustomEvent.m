@@ -130,10 +130,10 @@ static NSString *const kUnityAdsOptionZoneIdKey = @"zoneId";
 
 #pragma mark - UnityAdsLoadDelegate Methods
 
-- (void)unityAdsAdFailedToLoad:(nonnull NSString *)placementId {
-    NSError *error = [NSError errorWithDomain:MoPubRewardedVideoAdsSDKDomain code:MPRewardedVideoAdErrorUnknown userInfo:nil];
-    MPLogAdEvent([MPLogEvent adLoadFailedForAdapter:NSStringFromClass(self.class) error:error], [self getAdNetworkId]);
-     [self.delegate fullscreenAdAdapter:self didFailToLoadAdWithError:error];
+- (void)unityAdsAdFailedToLoad:(NSString *)placementId withError:(UnityAdsLoadError)error withMessage:(NSString *)message {
+    NSError *mopubError = [NSError errorWithDomain:MoPubRewardedVideoAdsSDKDomain code:MPRewardedVideoAdErrorUnknown userInfo:nil];
+    MPLogAdEvent([MPLogEvent adLoadFailedForAdapter:NSStringFromClass(self.class) error:mopubError], [self getAdNetworkId]);
+     [self.delegate fullscreenAdAdapter:self didFailToLoadAdWithError:mopubError];
 }
 
 - (void)unityAdsAdLoaded:(nonnull NSString *)placementId {

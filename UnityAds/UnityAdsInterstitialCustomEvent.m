@@ -132,7 +132,7 @@ static NSString *const kUnityAdsOptionZoneIdKey = @"zoneId";
     MPLogAdEvent([MPLogEvent adLoadSuccessForAdapter:NSStringFromClass(self.class)], [self getAdNetworkId]);
 }
 
-- (void)unityAdsAdFailedToLoad:(nonnull NSString *)placementId {
+- (void)unityAdsAdFailedToLoad:(NSString *)placementId withError:(UnityAdsLoadError)error withMessage:(NSString *)message {
     NSError *errorLoad = [self createErrorWith:@"Unity Ads failed to load interstitial ad"
                                      andReason:@""
                                  andSuggestion:@""];
@@ -165,7 +165,6 @@ static NSString *const kUnityAdsOptionZoneIdKey = @"zoneId";
 }
 
 - (void)unityAdsShowFailed:(NSString *)placementId withError:(UnityAdsShowError)error withMessage:(NSString *)message {
-
   if (error == kUnityAdsErrorShowError) {
     NSError *showError= [self createErrorWith:@"Unity Ads failed to show interstitial"
                                     andReason:message
