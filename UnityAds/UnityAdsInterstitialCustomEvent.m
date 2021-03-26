@@ -96,7 +96,7 @@ static NSString *const kUnityAdsOptionZoneIdKey = @"zoneId";
 - (void)presentAdFromViewController:(UIViewController *)viewController
 {
     if (![self hasAdAvailable]) {
-        MPLogWarn(@"Unity Ads received call to show before successfully loading");
+        MPLogWarn(@"Unity Ads received call to show before successfully loading an ad");
     }
 
     MPLogAdEvent([MPLogEvent adShowAttemptForAdapter:NSStringFromClass(self.class)], [self getAdNetworkId]);
