@@ -1,31 +1,28 @@
 //
-//  UnityAdsInstanceMediationSettings.h
+//  UnityAdsMediationSettingsProtocol.h
 //  MoPubSDK
 //
-//  Copyright (c) 2015 MoPub. All rights reserved.
+//  Copyright © 2021 MoPub. All rights reserved.
 //
 
-#import <Foundation/Foundation.h>
+#ifndef UnityAdsMediationSettingsProtocol_h
+#define UnityAdsMediationSettingsProtocol_h
 
-#if __has_include(<MoPub/MoPub.h>)
-    #import <MoPub/MoPub.h>
-#elif __has_include(<MoPubSDK/MoPub.h>)
-    #import <MoPubSDK/MoPub.h>
-#else
-    #import "MPMediationSettingsProtocol.h"
-#endif
+#import "MPMediationSettingsProtocol.h"
 
-/*
+/**
  * `UnityInstanceMediationSettings` allows the application to provide per-instance properties
  * to configure aspects of Unity ads. See `MPMediationSettingsProtocol` to see how mediation settings
  * are used.
  */
-@interface UnityAdsInstanceMediationSettings : NSObject <MPMediationSettingsProtocol>
+@interface UnityAdsMediationSettingsProtocol : NSObject <MPMediationSettingsProtocol>
 
-/*
+/**
  * An NSString that's used as an identifier for a specific user, and is passed along to Unity
  * when the rewarded video ad is played.
  */
 @property (nonatomic, copy) NSString *userIdentifier;
 
 @end
+
+#endif /* UnityAdsMediationSettingsProtocol_h */
