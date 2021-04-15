@@ -2,31 +2,38 @@
 //  UnityAdsAdapterConfiguration.m
 //  MoPubSDK
 //
-//  Copyright © 2017 MoPub. All rights reserved.
+//  Copyright © 2021 MoPub. All rights reserved.
 //
 
 #import <UnityAds/UnityAds.h>
+#import "UnityAdsConstants.h"
 #import "UnityAdsAdapterConfiguration.h"
-#import "UnityRouter.h"
+#import "UnityAdsAdapterInitializationDelegate.h"
 #if __has_include("MoPub.h")
-#import "MoPub.h"
-#import "MPLogging.h"
+    #import "MoPub.h"
+    #import "MPLogging.h"
 #endif
-
-//Adapter version
-NSString *const ADAPTER_VERSION = @"3.6.0.0";
-
-// Initialization configuration keys
-static NSString * const kUnityAdsGameId = @"gameId";
-
-// Errors
-static NSString * const kAdapterErrorDomain = @"com.mopub.mopub-ios-sdk.mopub-unity-adapters";
-
-typedef NS_ENUM(NSInteger, UnityAdsAdapterErrorCode) {
-    UnityAdsAdapterErrorCodeMissingGameId,
-};
+#import "UnityAdsConstants.h"
 
 @implementation UnityAdsAdapterConfiguration
+
+#pragma mark - MPAdapterConfiguration
+
+- (NSString * _Nonnull)adapterVersion {
+    return kUnityAdsAdapterVersion;
+}
+
+- (NSString * _Nullable)biddingToken {
+    return nil;
+}
+
+- (NSString * _Nonnull)moPubNetworkName {
+    return kUnityAdsAdapterMoPubNetworkName;
+}
+
+- (NSString * _Nonnull)networkSdkVersion {
+    return [UnityAds getVersion];
+}
 
 #pragma mark - Caching
 
@@ -41,43 +48,17 @@ typedef NS_ENUM(NSInteger, UnityAdsAdapterErrorCode) {
     }
 }
 
-#pragma mark - MPAdapterConfiguration
+#pragma mark - Initialization
 
-- (NSString *)adapterVersion {
-    return ADAPTER_VERSION;
-}
-
-- (NSString *)biddingToken {
-    return nil;
-}
-
-- (NSString *)moPubNetworkName {
-    return @"unity";
-}
-
-- (NSString *)networkSdkVersion {
-    return [UnityAds getVersion];
-}
-
-- (void)initializeNetworkWithConfiguration:(NSDictionary<NSString *, id> *)configuration
-                                  complete:(void(^)(NSError *))complete {
+- (void)initializeNetworkWithConfiguration:(NSDictionary<NSString *, id> * _Nullable)configuration complete:(void(^ _Nullable)(NSError * _Nullable))complete {
+    UnityAdsAdapterInitializationDelegate *delegate = [[UnityAdsAdapterInitializationDelegate alloc] initWith: complete];
     NSString * gameId = configuration[kUnityAdsGameId];
-    if (gameId == nil) {
-        NSError * error = [NSError errorWithDomain:kAdapterErrorDomain code:UnityAdsAdapterErrorCodeMissingGameId userInfo:@{ NSLocalizedDescriptionKey: @"Unity Ads initialization skipped. The gameId is empty. Ensure it is properly configured on the MoPub dashboard." }];
-        MPLogEvent([MPLogEvent error:error message:nil]);
-        
-        if (complete != nil) {
-            complete(error);
-        }
-        return;
-    }
-    
-    [[UnityRouter sharedRouter] initializeWithGameId:gameId withCompletionHandler:^(NSError * _Nullable error) {
-        complete(error);
-    }];
-    
-    BOOL debugModeEnabled = (MPLogging.consoleLogLevel == MPBLogLevelDebug);
-    [UnityAds setDebugMode:debugModeEnabled];
+    BOOL testMode = [[configuration[kUnityAdsTestMode] lowercaseString] isEqualToString:@"yes"];
+
+    [UnityAds initialize:gameId
+                testMode:testMode
+  enablePerPlacementLoad:true
+  initializationDelegate:delegate];
 }
 
 @end
