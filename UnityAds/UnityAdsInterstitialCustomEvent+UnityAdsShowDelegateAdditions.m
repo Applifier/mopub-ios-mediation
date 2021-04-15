@@ -6,11 +6,14 @@
 //
 
 #import <UnityAds/UnityAds.h>
+#import "UnityAdsConstants.h"
 #import "UnityAdsInterstitialCustomEvent+UnityAdsShowDelegateAdditions.h"
+#import "MPError.h"
 
 @implementation UnityAdsInterstitialCustomEvent (UnityAdsShowDelegate)
 
 - (void)unityAdsShowStart:(NSString * _Nonnull)placementId {
+    // TODO: MPLogAdEvent([MPLogEvent adShowAttemptForAdapter:NSStringFromClass(self.class)], [self getAdNetworkId]);
     [self.delegate fullscreenAdAdapterAdWillAppear:self];
     [self.delegate fullscreenAdAdapterAdDidAppear:self];
 }
@@ -27,17 +30,47 @@
 }
 
 - (void)unityAdsShowFailed:(NSString * _Nonnull)placementId withError:(UnityAdsShowError)error withMessage:(NSString * _Nonnull)message {
-//    switch (error) {
-//        case kUnityShowErrorNotInitialized:
-//        case kUnityShowErrorNotReady:
-//            [self.delegate fullscreenAdAdapterDidExpire:self];
-//        case kUnityShowErrorVideoPlayerError:
-//        case kUnityShowErrorInvalidArgument:
-//        case kUnityShowErrorNoConnection:
-//        case kUnityShowErrorAlreadyShowing:
-//        default kUnityShowErrorInternalError:
-//            [self.delegate fullscreenAdAdapter:self didFailToShowAdWithError:NSError];
-//    }
+
+    MOPUBErrorCode code;
+    NSString *description;
+
+    switch (error) {
+        case kUnityShowErrorNotInitialized:
+            code = MOPUBErrorUnknown;
+            description = kUnityAdsAdapterShowErrorInternalError;
+            break;
+        case kUnityShowErrorNotReady:
+            code = MOPUBErrorUnknown;
+            description = kUnityAdsAdapterShowErrorInternalError;
+            break;
+        case kUnityShowErrorVideoPlayerError:
+            code = MOPUBErrorUnknown;
+            description = kUnityAdsAdapterShowErrorInternalError;
+            break;
+        case kUnityShowErrorInvalidArgument:
+            code = MOPUBErrorUnknown;
+            description = kUnityAdsAdapterShowErrorInternalError;
+            break;
+        case kUnityShowErrorNoConnection:
+            code = MOPUBErrorUnknown;
+            description = kUnityAdsAdapterShowErrorInternalError;
+            break;
+        case kUnityShowErrorAlreadyShowing:
+            code = MOPUBErrorUnknown;
+            description = kUnityAdsAdapterShowErrorInternalError;
+            break;
+        case kUnityShowErrorInternalError:
+            code = MOPUBErrorUnknown;
+            description = kUnityAdsAdapterShowErrorInternalError;
+            break;
+        default:
+            code = MOPUBErrorUnknown;
+            description = kUnityAdsAdapterShowErrorUnknown;
+            break;
+    }
+
+    NSError *showError = [NSError errorWithCode:code localizedDescription:description];
+    [self.delegate fullscreenAdAdapter:self didFailToShowAdWithError: showError];
 }
 
 @end

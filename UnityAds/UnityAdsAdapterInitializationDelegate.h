@@ -10,21 +10,13 @@
 
 #import <UnityAds/UnityAds.h>
 
-/**
- TODO: Question: Why is it necissary to wrap UnityAdsInitializationDelegate like this?
- TODO: doc string.
- */
 @interface UnityAdsAdapterInitializationDelegate : NSObject<UnityAdsInitializationDelegate>
 
-/**
- TODO: doc string.
- */
+- (instancetype)init;
+- (instancetype)initWith: (void(^ _Nullable)(NSError * _Nullable))complete;
 
 @property(nonatomic, copy) void (^ initializationCompleteBlock)(void);
 @property(nonatomic, copy) void (^ initCompletion)(NSError * _Nullable);
-/**
- TODO: doc string.
- */
 @property(nonatomic, copy) void (^ initializationFailedBlock)(int error, NSString *message);
 
 @end

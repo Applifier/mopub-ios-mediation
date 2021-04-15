@@ -13,9 +13,18 @@
 #import "MPLogging.h"
 #import "UnityAdsConstants.h"
 
+#if __has_include(<MoPub/MoPub.h>)
+    #import <MoPub/MoPub.h>
+#elif __has_include(<MoPubSDK/MoPub.h>)
+    #import <MoPubSDK/MoPub.h>
+#else
+    #import "MPFullscreenAdAdapter.h"
+#endif
+
 @interface UnityAdsInterstitialCustomEvent ()
 
 @property (nonatomic, copy) NSString *placementId;
+@property (nonatomic) BOOL adLoaded;
 
 @end
 
@@ -24,10 +33,6 @@
 @dynamic delegate;
 @dynamic localExtras;
 @dynamic hasAdAvailable;
-
-- (NSString *) getAdNetworkId {
-    return (self.placementId != nil) ? self.placementId : @"";
-}
 
 #pragma mark - MPFullscreenAdAdapter Override
 
@@ -41,33 +46,26 @@
 }
 
 - (BOOL)hasAdAvailable{
-    return YES;
+    return _adLoaded;
 }
 
 - (void)requestAdWithAdapterInfo:(NSDictionary *)info adMarkup:(NSString *)adMarkup {
-    NSString *placementId = [info objectForKey:kUnityAdsOptionPlacementId];
-    if (placementId == nil) {
-        placementId = [info objectForKey:kUnityAdsOptionZoneId];
+    _placementId = [info objectForKey:kUnityAdsOptionPlacementId];
+    if (_placementId == nil) {
+        _placementId = ([info objectForKey:kUnityAdsOptionZoneId] != nil) ? [info objectForKey:kUnityAdsOptionZoneId] : @"";
     }
     
-    [UnityAds load:placementId loadDelegate:self];
-    MPLogAdEvent([MPLogEvent adLoadAttemptForAdapter:NSStringFromClass(self.class) dspCreativeId:nil dspName:nil], placementId);
+    MPLogAdEvent([MPLogEvent adLoadAttemptForAdapter:NSStringFromClass(self.class) dspCreativeId:nil dspName:nil], _placementId);
+    [UnityAds load:_placementId loadDelegate:self];
 }
 
 - (void)presentAdFromViewController:(UIViewController *)viewController {
     if (![self hasAdAvailable]) {
-        MPLogWarn(kUnityAdsShowWarningLoadNotSuccessful);
+        MPLogWarn(kUnityAdsAdapterShowWarningLoadNotSuccessful);
     }
-
-    // fullscreenAdAdapterAdWillAppear:self
-    MPLogAdEvent([MPLogEvent adShowAttemptForAdapter:NSStringFromClass(self.class)], [self getAdNetworkId]);
     
+    //MPLogAdEvent([MPLogEvent fullscreenAdAdapterAdWillAppear:NSStringFromClass(self.class)], _placementId);
     [UnityAds show:viewController placementId:_placementId showDelegate:self];
-}
-
-- (void)handleDidInvalidateAd
-{
-  // Nothing to clean up.
 }
 
 @end

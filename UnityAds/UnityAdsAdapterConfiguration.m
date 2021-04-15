@@ -6,6 +6,7 @@
 //
 
 #import <UnityAds/UnityAds.h>
+#import "UnityAdsConstants.h"
 #import "UnityAdsAdapterConfiguration.h"
 #import "UnityAdsAdapterInitializationDelegate.h"
 #if __has_include("MoPub.h")
@@ -19,7 +20,7 @@
 #pragma mark - MPAdapterConfiguration
 
 - (NSString * _Nonnull)adapterVersion {
-    return kAdapterVersion;
+    return kUnityAdsAdapterVersion;
 }
 
 - (NSString * _Nullable)biddingToken {
@@ -27,7 +28,7 @@
 }
 
 - (NSString * _Nonnull)moPubNetworkName {
-    return kMoPubNetworkName;
+    return kUnityAdsAdapterMoPubNetworkName;
 }
 
 - (NSString * _Nonnull)networkSdkVersion {
@@ -36,9 +37,6 @@
 
 #pragma mark - Caching
 
-/**
- TOOD: Doc
- */
 + (void)updateInitializationParameters:(NSDictionary *)parameters {
     // These should correspond to the required parameters checked in
     // `initializeNetworkWithConfiguration:complete:`
@@ -52,18 +50,13 @@
 
 #pragma mark - Initialization
 
-/**
- TODO: Doc
- */
 - (void)initializeNetworkWithConfiguration:(NSDictionary<NSString *, id> * _Nullable)configuration complete:(void(^ _Nullable)(NSError * _Nullable))complete {
-    UnityAdsAdapterInitializationDelegate *delegate = [[UnityAdsAdapterInitializationDelegate alloc] init];
-    delegate.initCompletion = complete;
+    UnityAdsAdapterInitializationDelegate *delegate = [[UnityAdsAdapterInitializationDelegate alloc] initWith: complete];
     NSString * gameId = configuration[kUnityAdsGameId];
-    
-    // TODO: Question: Is there a way to test if the MoPub SDK is configured for test mode
-    // and use that setting for testmode here?
+    BOOL testMode = [[configuration[kUnityAdsTestMode] lowercaseString] isEqualToString:@"yes"];
+
     [UnityAds initialize:gameId
-                testMode:true
+                testMode:testMode
   enablePerPlacementLoad:true
   initializationDelegate:delegate];
 }
