@@ -107,16 +107,6 @@ static NSString *const kUnityAdsOptionZoneIdKey = @"zoneId";
     MPLogAdEvent([MPLogEvent adLoadAttemptForAdapter:NSStringFromClass(self.class) dspCreativeId:nil dspName:nil], [self getAdNetworkId]);
 }
 
-- (NSError *)createErrorWith:(NSString *)description andReason:(NSString *)reaason andSuggestion:(NSString *)suggestion {
-    NSDictionary *userInfo = @{
-                               NSLocalizedDescriptionKey: NSLocalizedString(description, nil),
-                               NSLocalizedFailureReasonErrorKey: NSLocalizedString(reaason, nil),
-                               NSLocalizedRecoverySuggestionErrorKey: NSLocalizedString(suggestion, nil)
-                               };
-    
-    return [NSError errorWithDomain:NSStringFromClass([self class]) code:0 userInfo:userInfo];
-}
-
 - (void)presentAdFromViewController:(UIViewController *)viewController
 {
     if ([UnityAds isReady:_placementId]) {
@@ -184,11 +174,11 @@ static NSString *const kUnityAdsOptionZoneIdKey = @"zoneId";
 #pragma mark - UnityAdsShowDelegate Methods
 
 - (void)unityAdsShowStart:(nonnull NSString *)placementId {
-  [self.delegate fullscreenAdAdapterAdWillPresent:self];
+  [self.delegate fullscreenAdAdapterAdWillAppear:self];
   MPLogAdEvent([MPLogEvent adWillAppearForAdapter:NSStringFromClass(self.class)], placementId);
   MPLogAdEvent([MPLogEvent adShowSuccessForAdapter:NSStringFromClass(self.class)], placementId);
 
-  [self.delegate fullscreenAdAdapterAdDidPresent:self];
+  [self.delegate fullscreenAdAdapterAdDidAppear:self];
   [self.delegate fullscreenAdAdapterDidTrackImpression:self];
   MPLogAdEvent([MPLogEvent adDidAppearForAdapter:NSStringFromClass(self.class)], placementId);
 }

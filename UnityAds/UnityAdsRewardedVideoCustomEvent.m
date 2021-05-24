@@ -126,7 +126,7 @@ static NSString *const kUnityAdsOptionZoneIdKey = @"zoneId";
             [UnityAds show:viewController placementId:_placementId];
         }
     } else {
-        NSError *error = [NSError errorWithDomain:MoPubRewardedVideoAdsSDKDomain code:MPRewardedVideoAdErrorNoAdsAvailable userInfo:nil];
+        NSError *error = [NSError errorWithDomain:MoPubRewardedAdsSDKDomain code:MPRewardedAdErrorNoAdsAvailable userInfo:nil];
         MPLogAdEvent([MPLogEvent adLoadFailedForAdapter:NSStringFromClass(self.class) error:error], [self getAdNetworkId]);
         [self.delegate fullscreenAdAdapter:self didFailToShowAdWithError:error];
         MPLogWarn(@"Unity Ads received call to show before successfully loading an ad");
@@ -164,10 +164,11 @@ static NSString *const kUnityAdsOptionZoneIdKey = @"zoneId";
 
 - (void)unityAdsShowStart:(nonnull NSString *)placementId {
   MPLogAdEvent([MPLogEvent adWillAppearForAdapter:NSStringFromClass(self.class)], placementId);
-  [self.delegate fullscreenAdAdapterAdWillPresent:self];
-
-  [self.delegate fullscreenAdAdapterAdDidPresent:self];
+    
+  [self.delegate fullscreenAdAdapterAdWillAppear:self];
+  [self.delegate fullscreenAdAdapterAdDidAppear:self];
   [self.delegate fullscreenAdAdapterDidTrackImpression:self];
+    
   MPLogAdEvent([MPLogEvent adShowSuccessForAdapter:NSStringFromClass(self.class)], placementId);
   MPLogAdEvent([MPLogEvent adDidAppearForAdapter:NSStringFromClass(self.class)], placementId);
 }
