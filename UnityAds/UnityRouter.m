@@ -66,9 +66,9 @@
         [mediationMetaData commit];
         
         UADSMetaData *headerBiddingMeta = [[UADSMetaData alloc]initWithCategory:@"headerbidding"];
-                [headerBiddingMeta set:@"mode" value:@"enabled"];
-                [headerBiddingMeta commit];
-        
+        [headerBiddingMeta set:@"mode" value:@"enabled"];
+        [headerBiddingMeta commit];
+         
         UnityAdsAdapterInitializationDelegate *initDelegate = [[UnityAdsAdapterInitializationDelegate alloc] init];
         
         initDelegate.initializationCompleteBlock = ^{
@@ -115,3 +115,4 @@
 }
 
 @end
+ 

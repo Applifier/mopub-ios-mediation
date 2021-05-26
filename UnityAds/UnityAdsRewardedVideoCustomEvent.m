@@ -114,31 +114,36 @@ static NSString *const kUnityAdsOptionZoneIdKey = @"zoneId";
 
 - (void)presentAdFromViewController:(UIViewController *)viewController
 {
-    if ([self hasAdAvailable]) {
-        MPLogAdEvent([MPLogEvent adShowAttemptForAdapter:NSStringFromClass(self.class)], [self getAdNetworkId]);
-        [UnityAds addDelegate:self];
-        if (_objectId != nil) {
-            UADSShowOptions *options = [UADSShowOptions new];
-            [options setObjectId:_objectId];
-            
-            [UnityAds show:viewController placementId:_placementId options:options];
-        } else {
-            [UnityAds show:viewController placementId:_placementId];
-        }
-    } else {
-        NSError *error = [NSError errorWithDomain:MoPubRewardedAdsSDKDomain code:MPRewardedAdErrorNoAdsAvailable userInfo:nil];
-        MPLogAdEvent([MPLogEvent adLoadFailedForAdapter:NSStringFromClass(self.class) error:error], [self getAdNetworkId]);
-        [self.delegate fullscreenAdAdapter:self didFailToShowAdWithError:error];
-        MPLogWarn(@"Unity Ads received call to show before successfully loading an ad");
+    if (![self hasAdAvailable]) {
+            MPLogWarn(@"Unity Ads received call to show before successfully loading an ad");
     }
-
+    
     MPLogAdEvent([MPLogEvent adShowAttemptForAdapter:NSStringFromClass(self.class)], [self getAdNetworkId]);
-    [UnityAds show:viewController placementId:_placementId showDelegate:self];
+    
+    if (_objectId != nil) {
+        UADSShowOptions *options = [UADSShowOptions new];
+        [options setObjectId:_objectId];
+        
+        [UnityAds show:viewController placementId:_placementId options:options showDelegate:self];
+    } else {
+        [UnityAds show:viewController placementId:_placementId showDelegate:self];
+    }
 }
 
 - (void)handleDidInvalidateAd
 {
   // Nothing to clean up.
+}
+
+- (void) sendMetadataAdShownCorrect: (BOOL) isAdShown {
+    UADSMediationMetaData *headerBiddingMeta = [[UADSMediationMetaData alloc]initWithCategory:@"mediation"];
+    if(isAdShown) {
+        [headerBiddingMeta setOrdinal: ++_impressionOrdinal];
+    }
+    else {
+        [headerBiddingMeta setMissedImpressionOrdinal: ++_missedImpressionOrdinal];
+    }
+    [headerBiddingMeta commit];
 }
 
 #pragma mark - UnityAdsLoadDelegate Methods
@@ -164,11 +169,10 @@ static NSString *const kUnityAdsOptionZoneIdKey = @"zoneId";
 
 - (void)unityAdsShowStart:(nonnull NSString *)placementId {
   MPLogAdEvent([MPLogEvent adWillAppearForAdapter:NSStringFromClass(self.class)], placementId);
-    
   [self.delegate fullscreenAdAdapterAdWillAppear:self];
+    
   [self.delegate fullscreenAdAdapterAdDidAppear:self];
   [self.delegate fullscreenAdAdapterDidTrackImpression:self];
-    
   MPLogAdEvent([MPLogEvent adShowSuccessForAdapter:NSStringFromClass(self.class)], placementId);
   MPLogAdEvent([MPLogEvent adDidAppearForAdapter:NSStringFromClass(self.class)], placementId);
 }
@@ -213,17 +217,5 @@ static NSString *const kUnityAdsOptionZoneIdKey = @"zoneId";
     MPLogAdEvent([MPLogEvent adLoadFailedForAdapter:NSStringFromClass(self.class) error:showError], placementId);
     [self.delegate fullscreenAdAdapter:self didFailToLoadAdWithError:showError];
 }
-
-- (void) sendMetadataAdShownCorrect: (BOOL) isAdShown {
-    UADSMediationMetaData *headerBiddingMeta = [[UADSMediationMetaData alloc]initWithCategory:@"mediation"];
-    if(isAdShown) {
-        [headerBiddingMeta setOrdinal: ++_impressionOrdinal];
-    }
-    else {
-        [headerBiddingMeta setMissedImpressionOrdinal: ++_missedImpressionOrdinal];
-    }
-    [headerBiddingMeta commit];
-}
-
 
 @end

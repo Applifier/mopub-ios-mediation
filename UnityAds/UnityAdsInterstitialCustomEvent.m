@@ -109,30 +109,22 @@ static NSString *const kUnityAdsOptionZoneIdKey = @"zoneId";
 
 - (void)presentAdFromViewController:(UIViewController *)viewController
 {
-    if ([UnityAds isReady:_placementId]) {
-        MPLogAdEvent([MPLogEvent adShowAttemptForAdapter:NSStringFromClass(self.class)], [self getAdNetworkId]);
-        [UnityAds addDelegate:self];
-        
-        if (_objectId != nil) {
-            UADSShowOptions *options = [UADSShowOptions new];
-            [options setObjectId:_objectId];
-            
-            [UnityAds show:viewController placementId:_placementId options:options];
-        } else {
-            [UnityAds show:viewController placementId:_placementId];
-        }
-    } else {
+    if (![self hasAdAvailable]) {
         MPLogWarn(@"Unity Ads received call to show before successfully loading an ad");
-        NSError *error = [self createErrorWith:@"Unity Ads failed to show interstitial"
-                                     andReason:@"There is no available interstitial ad."
-                                 andSuggestion:@""];
         
-        MPLogAdEvent([MPLogEvent adShowFailedForAdapter:NSStringFromClass(self.class) error:error], [self getAdNetworkId]);
-        [self.delegate fullscreenAdAdapter:self didFailToShowAdWithError:error];
+        
     }
-
+    
     MPLogAdEvent([MPLogEvent adShowAttemptForAdapter:NSStringFromClass(self.class)], [self getAdNetworkId]);
-    [UnityAds show:viewController placementId:_placementId showDelegate:self];
+    
+    if (_objectId != nil) {
+        UADSShowOptions *options = [UADSShowOptions new];
+        [options setObjectId:_objectId];
+        
+        [UnityAds show:viewController placementId:_placementId options:options showDelegate:self];
+    } else {
+        [UnityAds show:viewController placementId:_placementId showDelegate:self];
+    }
 }
 
 - (void)handleDidInvalidateAd
@@ -140,18 +132,16 @@ static NSString *const kUnityAdsOptionZoneIdKey = @"zoneId";
   // Nothing to clean up.
 }
 
-/// This callback is used for expiration, please see here: https://developers.mopub.com/networks/integrate/build-adapters-ios/#quick-start-for-fullscreen-ads
-- (void)handleDidPlayAd
-{
-    // If we no longer have an ad available, report back up to the application that this ad expired.
-    // We receive this message only when this ad has reported an ad has loaded and another ad unit
-    // has played a video for the same ad network.
-    if (![self hasAdAvailable]) {
-        MPLogInfo(@"Unity Ads interstitial has expired");
-        [self.delegate fullscreenAdAdapterDidExpire:self];
-        MPLogAdEvent([MPLogEvent adExpiredWithTimeInterval:0], [self getAdNetworkId]);
-    }
+- (void) sendMetadataAdShownCorrect: (BOOL) isAdShown {UADSMediationMetaData *headerBiddingMeta = [[UADSMediationMetaData alloc]initWithCategory:@"mediation"];
+  if(isAdShown) {
+    [headerBiddingMeta setOrdinal: ++_impressionOrdinal];
+  }
+  else {
+    [headerBiddingMeta setMissedImpressionOrdinal: ++_missedImpressionOrdinal];
+  }
+  [headerBiddingMeta commit];
 }
+
 #pragma mark - UnityAdsLoadDelegate Methods
 
 - (void)unityAdsAdLoaded:(NSString *)placementId {
@@ -202,16 +192,6 @@ static NSString *const kUnityAdsOptionZoneIdKey = @"zoneId";
   if ([self.delegate respondsToSelector:@selector(fullscreenAdAdapterAdDidDismiss:)]) {
     [self.delegate fullscreenAdAdapterAdDidDismiss:self];
   }
-}
-
-- (void) sendMetadataAdShownCorrect: (BOOL) isAdShown {UADSMediationMetaData *headerBiddingMeta = [[UADSMediationMetaData alloc]initWithCategory:@"mediation"];
-  if(isAdShown) {
-    [headerBiddingMeta setOrdinal: ++_impressionOrdinal];
-  }
-  else {
-    [headerBiddingMeta setMissedImpressionOrdinal: ++_missedImpressionOrdinal];
-  }
-  [headerBiddingMeta commit];
 }
 
 - (void)unityAdsShowFailed:(NSString *)placementId withError:(UnityAdsShowError)error withMessage:(NSString *)message {
