@@ -42,10 +42,6 @@ static NSString *const kUnityAdsOptionZoneIdKey = @"zoneId";
     [[UnityRouter sharedRouter] initializeWithGameId:gameId withCompletionHandler:nil];
 }
 
-- (NSString *) getAdNetworkId {
-    return (self.placementId != nil) ? self.placementId : @"";
-}
-
 #pragma mark - MPFullscreenAdAdapter Override
 
 - (BOOL)enableAutomaticImpressionAndClickTracking
@@ -60,6 +56,10 @@ static NSString *const kUnityAdsOptionZoneIdKey = @"zoneId";
 
 - (BOOL)hasAdAvailable {
     return _placementId != nil;
+}
+
+- (NSString *) getAdNetworkId {
+    return (self.placementId != nil) ? self.placementId : @"";
 }
 
 - (void)requestAdWithAdapterInfo:(NSDictionary *)info adMarkup:(NSString *)adMarkup
@@ -106,9 +106,9 @@ static NSString *const kUnityAdsOptionZoneIdKey = @"zoneId";
         [options setObjectId:_objectId];
         [options setAdMarkup:adMarkup];
         
-        [UnityAds load:self.placementId options:options loadDelegate:self];
+        [UnityAds load:placementId options:options loadDelegate:self];
     } else {
-        [UnityAds load:self.placementId loadDelegate:self];
+        [UnityAds load:placementId loadDelegate:self];
     }
 }
 

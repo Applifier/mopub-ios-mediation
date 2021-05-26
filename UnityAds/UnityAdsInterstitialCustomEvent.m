@@ -99,9 +99,9 @@ static NSString *const kUnityAdsOptionZoneIdKey = @"zoneId";
         [options setObjectId:_objectId];
         [options setAdMarkup:adMarkup];
         
-        [UnityAds load:self.placementId options:options loadDelegate:self];
+        [UnityAds load:placementId options:options loadDelegate:self];
     } else {
-        [UnityAds load:self.placementId loadDelegate:self];
+        [UnityAds load:placementId loadDelegate:self];
     }
     
     MPLogAdEvent([MPLogEvent adLoadAttemptForAdapter:NSStringFromClass(self.class) dspCreativeId:nil dspName:nil], [self getAdNetworkId]);
