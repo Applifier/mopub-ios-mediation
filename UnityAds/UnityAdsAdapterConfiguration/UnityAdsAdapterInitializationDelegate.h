@@ -12,8 +12,7 @@
 
 @interface UnityAdsAdapterInitializationDelegate : NSObject<UnityAdsInitializationDelegate>
 
-- (instancetype)init;
-- (instancetype)initWith: (void(^ _Nullable)(NSError * _Nullable))complete;
++ (instancetype)newWith: (void(^ _Nullable)(NSError * _Nullable))complete;
 
 @property(nonatomic, copy) void (^ initializationCompleteBlock)(void);
 @property(nonatomic, copy) void (^ initCompletion)(NSError * _Nullable);

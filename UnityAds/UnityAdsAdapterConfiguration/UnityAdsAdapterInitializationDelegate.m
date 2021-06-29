@@ -19,8 +19,8 @@
 
 @implementation UnityAdsAdapterInitializationDelegate
 
-- (instancetype)init {
-    return [self initWith: 0];
++ (instancetype)newWith: (void(^ _Nullable)(NSError * _Nullable))complete {
+    return [[self alloc] initWith: complete];
 }
 
 - (instancetype)initWith: (void(^ _Nullable)(NSError * _Nullable))complete {

@@ -25,7 +25,7 @@ static NSString *const kUnityAdsOptionZoneId = @"zoneId";
 
 #pragma mark - Initialization Error Descriptions
 
-static NSString *const kUnityAdsAdapterInitializationErrorEmptyGameId = @"[UnityAds] initialization skipped. The gameId is empty. Ensure it is properly configured on the MoPub dashboard.";
+static NSString *const kUnityAdsAdapterInitializationErrorEmptyGameId = @"initialization skipped. The gameId is empty. Ensure it is properly configured on the MoPub dashboard.";
 static NSString *const kUnityAdsAdapterInitializationErrorInternalError = @"[UnityAds] TODO: kUnityAdapterInitializationErrorInternalError";
 static NSString *const kUnityAdsAdapterInitializationErrorInvalidArgument = @"[UnityAds] TODO: kUnityAdapterInitializationErrorInvalidArgument";
 static NSString *const kUnityAdsAdapterInitializationErrorAdBlockerDetected = @"[UnityAds] TODO: kUnityAdapterInitializationErrorAdBlockerDetected";
@@ -41,6 +41,8 @@ static NSString *const kUnityAdsAdapterLoadErrorTimeout = @"[UnityAds] TODO: kUn
 static NSString *const kUnityAdsAdapterLoadErrorInternal = @"[UnityAds] TODO: kUnityAdsAdapterLoadErrorInternalError";
 static NSString *const kUnityAdsAdapterLoadErrorUnknown = @"[UnityAds] TODO: kUnityAdsAdapterLoadErrorUnknown";
 
+// [UnityAds] Interstitial: Timeout while loading placemnet: ...
+
 #pragma mark - Show Error Descriptions
 
 static NSString *const kUnityAdsAdapterShowWarningLoadNotSuccessful = @"[UnityAds] received call to show before successfully loading an ad";
@@ -52,5 +54,6 @@ static NSString *const kUnityAdsAdapterShowErrorNoConnection = @"[UnityAds] TODO
 static NSString *const kUnityAdsAdapterShowErrorAlreadyShowing = @"[UnityAds] TODO: kUnityAdapterShowErrorAlreadyShowing";
 static NSString *const kUnityAdsAdapterShowErrorInternalError = @"[UnityAds] TODO: kUnityAdapterShowErrorInternalError";
 static NSString *const kUnityAdsAdapterShowErrorUnknown = @"[UnityAds] TODO: kUnityAdapterShowErrorUnknown";
+
 
 #endif /* UnityAdsConstants_h */

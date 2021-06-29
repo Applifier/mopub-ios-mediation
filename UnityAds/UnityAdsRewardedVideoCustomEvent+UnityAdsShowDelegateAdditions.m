@@ -1,5 +1,5 @@
 //
-//  UnityAdsInterstitial+UnityAdsShowDelegateAdditions.m
+//  UnityAdsRewardedVideoCustomEvent+UnityAdsShowDelegateAdditions.m
 //  MoPubSDK
 //
 //  Copyright © 2021 MoPub. All rights reserved.
@@ -7,10 +7,10 @@
 
 #import <UnityAds/UnityAds.h>
 #import "UnityAdsConstants.h"
-#import "UnityAdsInterstitialCustomEvent+UnityAdsShowDelegateAdditions.h"
+#import "UnityAdsRewardedVideoCustomEvent+UnityAdsShowDelegateAdditions.h"
 #import "MPError.h"
 
-@implementation UnityAdsInterstitialCustomEvent (UnityAdsShowDelegate)
+@implementation UnityAdsRewardedVideoCustomEvent (UnityAdsShowDelegate)
 
 - (void)unityAdsShowStart:(NSString * _Nonnull)placementId {
     // TODO: MPLogAdEvent([MPLogEvent adShowAttemptForAdapter:NSStringFromClass(self.class)], [self getAdNetworkId]);

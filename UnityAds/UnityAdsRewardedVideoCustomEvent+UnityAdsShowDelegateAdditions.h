@@ -1,21 +1,21 @@
 //
-//  UnityAdsInterstitial+UnityAdsShowDelegateAdditions.h
+//  UnityAdsRewardedVideoCustomEvent+UnityAdsShowDelegateAdditions.h
 //  MoPubSDK
 //
 //  Copyright © 2021 MoPub. All rights reserved.
 //
 
-#ifndef UnityAdsInterstitial_UnityAdsShowDelegateAdditions_h
-#define UnityAdsInterstitial_UnityAdsShowDelegateAdditions_h
+#ifndef UnityAdsRewardedVideoCustomEvent_UnityAdsShowDelegateAdditions_h
+#define UnityAdsRewardedVideoCustomEvent_UnityAdsShowDelegateAdditions_h
 
 #import <UnityAds/UnityAds.h>
-#import "UnityAdsInterstitialCustomEvent.h"
+#import "UnityAdsRewardedVideoCustomEvent.h"
 
 /**
  * The `UnityAdsShowDelegate` defines the methods which will notify UnityAds show call
  * is either successfully completed with its completion state or failed with error category and error message
  */
-@interface UnityAdsInterstitialCustomEvent (UnityAdsShowDelegate)
+@interface UnityAdsRewardedVideoCustomEvent (UnityAdsShowDelegate)
 
 /**
  * Called when UnityAds has started to show ad with a specific placement.
@@ -46,4 +46,4 @@
 
 @end
 
-#endif /* UnityAdsInterstitial_UnityAdsShowDelegateAdditions_h */
+#endif /* UnityAdsRewardedVideoCustomEvent_UnityAdsShowDelegateAdditions_h */

@@ -1,20 +1,21 @@
 //
-//  UnityAdsInterstitial+UnityAdsLoadDelegateAdditions.h
+//  UnityAdsRewardedVideoCustomEvent+UnityAdsLoadDelegateAdditions.h
 //  MoPubSDK
 //
 //  Copyright © 2021 MoPub. All rights reserved.
 //
 
-#ifndef UnityAdsInterstitial_UnityAdsLoadDelegateAdditions_h
-#define UnityAdsInterstitial_UnityAdsLoadDelegateAdditions_h
+#ifndef UnityAdsRewardedVideoCustomEvent_UnityAdsLoadDelegateAdditions_h
+#define UnityAdsRewardedVideoCustomEvent_UnityAdsLoadDelegateAdditions_h
+
 
 #import <UnityAds/UnityAds.h>
-#import "UnityAdsInterstitialCustomEvent.h"
+#import "UnityAdsRewardedVideoCustomEvent.h"
 
 /**
  *  The `UnityAdsLoadDelegate` protocol defines the required methods for receiving messages from UnityAds.load() method.
  */
-@interface UnityAdsInterstitialCustomEvent (UnityAdsLoadDelegate)
+@interface UnityAdsRewardedVideoCustomEvent (UnityAdsLoadDelegate)
 
 /**
  *  Callback triggered when a load request has successfully filled the specified placementId with an ad that is ready to show.
@@ -33,4 +34,5 @@
 
 @end
 
-#endif /* UnityAdsInterstitial_UnityAdsLoadDelegateAdditions_h */
+
+#endif /* UnityAdsRewardedVideoCustomEvent_UnityAdsLoadDelegateAdditions_h */

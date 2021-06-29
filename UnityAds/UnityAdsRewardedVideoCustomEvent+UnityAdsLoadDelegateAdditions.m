@@ -1,12 +1,12 @@
 //
-//  UnityAdsInterstitial+UnityAdsLoadDelegateAdditions.m
+//  UnityAdsRewardedVideoCustomEvent+UnityAdsLoadDelegateAdditions.m
 //  MoPubSDK
 //
 //  Copyright © 2021 MoPub. All rights reserved.
 //
 
 #import "UnityAdsConstants.h"
-#import "UnityAdsInterstitialCustomEvent+UnityAdsLoadDelegateAdditions.h"
+#import "UnityAdsRewardedVideoCustomEvent+UnityAdsLoadDelegateAdditions.h"
 
 #if __has_include(<MoPub/MoPub.h>)
     #import <MoPub/MoPub.h>
@@ -19,14 +19,14 @@
 #import "MPLogging.h"
 #import "MPError.h"
 
-@interface UnityAdsInterstitialCustomEvent ()
+@interface UnityAdsRewardedVideoCustomEvent ()
 
 @property (nonatomic, copy) NSString *placementId;
 @property (nonatomic) BOOL adLoaded;
 
 @end
 
-@implementation UnityAdsInterstitialCustomEvent (UnityAdsLoadDelegate)
+@implementation UnityAdsRewardedVideoCustomEvent (UnityAdsLoadDelegate)
 
 - (void)unityAdsAdLoaded:(NSString * _Nonnull)placementId {
     self.adLoaded = YES;
@@ -70,4 +70,3 @@
 }
 
 @end
- 

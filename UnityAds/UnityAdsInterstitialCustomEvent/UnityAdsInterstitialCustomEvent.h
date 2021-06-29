@@ -9,12 +9,13 @@
 #define UnityAdsInterstitial_h
 
 #import <MPFullscreenAdAdapter.h>
+#import "UnityAdsAbstractAd.h"
 
-// TODO: Update MoPub dahsboard to include new class UnityAdsInterstitial
+// TODO: Can this be renamed to UADSInterstitialAd?
 /**
  TODO: doc string.
  */
-@interface UnityAdsInterstitialCustomEvent : MPFullscreenAdAdapter <MPThirdPartyFullscreenAdAdapter>
+@interface UnityAdsInterstitialCustomEvent : UnityAdsAbstractAd
 
 @end
 

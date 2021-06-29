@@ -51,10 +51,10 @@
 #pragma mark - Initialization
 
 - (void)initializeNetworkWithConfiguration:(NSDictionary<NSString *, id> * _Nullable)configuration complete:(void(^ _Nullable)(NSError * _Nullable))complete {
-    UnityAdsAdapterInitializationDelegate *delegate = [[UnityAdsAdapterInitializationDelegate alloc] initWith: complete];
+    UnityAdsAdapterInitializationDelegate *delegate = [UnityAdsAdapterInitializationDelegate newWith: complete];
     NSString * gameId = configuration[kUnityAdsGameId];
     BOOL testMode = [[configuration[kUnityAdsTestMode] lowercaseString] isEqualToString:@"yes"];
-
+    
     [UnityAds initialize:gameId
                 testMode:testMode
   enablePerPlacementLoad:true
