@@ -11,7 +11,6 @@
 #import <MPFullscreenAdAdapter.h>
 #import "UnityAdsAbstractAd.h"
 
-// TODO: Can this be renamed to UADSInterstitialAd?
 /**
  TODO: doc string.
  */

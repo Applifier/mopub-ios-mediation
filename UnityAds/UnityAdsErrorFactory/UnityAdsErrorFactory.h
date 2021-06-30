@@ -7,12 +7,11 @@
 
 #import <Foundation/Foundation.h>
 #import <UnityAds/UnityAds.h>
-#import "UnityAdsLogger.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
 @interface UnityAdsErrorFactory : NSObject
--(id<UnityAdsLogMessage>)loadErrorlogEvent: (UnityAdsLoadError) type withMessage: (NSString *)message;
++ (NSError *)createErrorWith:(NSString *)description andReason:(NSString *)reason andSuggestion:(NSString *)suggestion;
 -(NSError *)loadErrorForType: (UnityAdsLoadError) type withMessage: (NSString *)message;
 -(NSError *)showErrorForType: (UnityAdsShowError) type withMessage: (NSString *)message;
 @end

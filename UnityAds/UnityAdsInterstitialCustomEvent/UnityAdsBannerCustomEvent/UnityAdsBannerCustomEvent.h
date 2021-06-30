@@ -1,17 +1,19 @@
 //
 //  UnityAdsBannerCustomEvent.h
-//  MoPub-TestApp-Local
+//  MoPubSDK
 //
-//  Created by Richard Hawkins on 4/22/21.
-//  Copyright © 2021 Unity Ads. All rights reserved.
+//  Copyright © 2021 MoPub. All rights reserved.
 //
 
-#import <Foundation/Foundation.h>
+#import <UnityAds/UADSBannerViewDelegate.h>
 
-NS_ASSUME_NONNULL_BEGIN
+#if __has_include(<MoPub/MoPub.h>)
+  #import <MoPub/MoPub.h>
+#elif __has_include(<MoPubSDK/MoPub.h>)
+  #import <MoPubSDK/MoPub.h>
+#else
+  #import "MPInlineAdAdapter.h"
+#endif
 
-@interface UnityAdsBannerCustomEvent : NSObject
-
+@interface UnityAdsBannerCustomEvent : MPInlineAdAdapter <MPThirdPartyInlineAdAdapter, UADSBannerViewDelegate>
 @end
-
-NS_ASSUME_NONNULL_END

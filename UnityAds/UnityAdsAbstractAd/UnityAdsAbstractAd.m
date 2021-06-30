@@ -1,16 +1,13 @@
 //
 //  UnityAdsAbstractAd.m
-//  MoPub-TestApp-Local
+//  MoPubSDK
 //
-//  Created by Richard Hawkins on 4/20/21.
-//  Copyright © 2021 Unity Ads. All rights reserved.
+//  Copyright © 2021 MoPub. All rights reserved.
 //
 
 #import <UnityAds/UnityAds.h>
 #import "UnityAdsInterstitialCustomEvent.h"
 #import "UnityAdsAdapterConfiguration.h"
-#import "UnityAdsLogger.h"
-#import "UnityAdsDomainLogger.h"
 #import "MPLogging.h"
 #import "UnityAdsConstants.h"
 
@@ -37,16 +34,9 @@
 
 #pragma mark - MPFullscreenAdAdapter Override
 
-#import "MPLogging.h"
-#import "UnityAdsLogger.h"
-#import "UnityAdsErrorFactory.h"
-
 - (instancetype) init {
     self = [super init];
     if (self) {
-        self.logger = [[UnityAdsDomainLogger alloc] init: @"Abstract"];
-        UnityErrorLogEvent *msg = [UnityErrorLogEvent newWithMessage:@"|-o-| TESTING" andDetails:@"foo"];
-        [self.logger logMessage:msg];
     }
     return self;
 }
@@ -80,32 +70,30 @@
 
 - (void)presentAdFromViewController:(UIViewController *)viewController {
     if (![self hasAdAvailable]) {
-        MPLogWarn(kUnityAdsAdapterShowWarningLoadNotSuccessful);
+        MPLogInfo(kUnityAdsAdapterShowWarningLoadNotSuccessful);
+        // Allow to continue to show call, giving Unity Ads insight that an ad
+        // was attempted to be shown.
     }
     
-    //MPLogAdEvent([MPLogEvent fullscreenAdAdapterAdWillAppear:NSStringFromClass(self.class)], _placementId);
     [UnityAds show:viewController placementId:_placementId showDelegate:self];
 }
 
 #pragma mark - UnityAdsLoadDelegate Methods
 
 - (void)unityAdsAdLoaded:(NSString * _Nonnull)placementId {
-    [self.logger logMessage: @"|-o-| Testing"];
     self.adLoaded = YES;
     [self.delegate fullscreenAdAdapterDidLoadAd:self];
 }
 
 - (void)unityAdsAdFailedToLoad:(NSString * _Nonnull)placementId withError:(UnityAdsLoadError)error withMessage:(NSString * _Nonnull)message {
     NSError *loadError = [self.errorFactory loadErrorForType:error withMessage:message];
-    [self.logger logMessage: [self.errorFactory loadErrorlogEvent: error withMessage: message]];
-    // TODO: verify if mopub will logs this error, or if we need to.
+    [MPLogEvent adLoadFailedForAdapter:@"" error:loadError];
     [self.delegate fullscreenAdAdapter:self didFailToLoadAdWithError: loadError];
 }
 
 #pragma mark - UnityAdsShowDelegate Methods
 
 -(void)unityAdsShowStart:(NSString * _Nonnull)placementId {
-   // TODO: MPLogAdEvent([MPLogEvent adShowAttemptForAdapter:NSStringFromClass(self.class)], [self getAdNetworkId]);
    [self.delegate fullscreenAdAdapterAdWillAppear:self];
    [self.delegate fullscreenAdAdapterAdDidAppear:self];
 }

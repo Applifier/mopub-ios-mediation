@@ -8,8 +8,6 @@
 #import <UnityAds/UnityAds.h>
 #import "UnityAdsInterstitialCustomEvent.h"
 #import "UnityAdsAdapterConfiguration.h"
-#import "UnityAdsLogger.h"
-#import "UnityAdsDomainLogger.h"
 #import "MPLogging.h"
 #import "UnityAdsConstants.h"
 #import "UnityAdsAbstractAd.h"
@@ -31,7 +29,6 @@
 - (instancetype) init {
     self = [super init];
     if (self) {
-        self.logger = [[UnityAdsDomainLogger alloc] init: @"Interstitial"];
     }
     return self;
 }

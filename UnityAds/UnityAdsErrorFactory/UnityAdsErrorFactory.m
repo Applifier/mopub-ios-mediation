@@ -20,41 +20,17 @@
 #import "MPError.h"
 #import "UnityAdsErrorFactory.h"
 
-
-
-@interface UnityErrorLogEvent: NSObject<UnityAdsLogMessage>
-//@property (nonatomic) MPBLogLevel logLevel;
-@property (nonatomic, copy) NSString *message;
-@property (nonatomic, copy) NSString *details;
-
-
-+(instancetype)newEmptyGameID: (NSString *)details;
-@end
-
-
-@implementation UnityErrorLogEvent
-+newWithMessage: (NSString *)message andDetails: (NSString *)details {
-    UnityErrorLogEvent *event = [UnityErrorLogEvent new];
-    //event.logLevel = MPBLogLevelDebug; // TODO: Set
-    event.message = message;
-    event.details = details;
-    return event;
-}
-
-+(instancetype)newEmptyGameID: (NSString *)details {
-    return [self newWithMessage: @"initialization skipped. The gameId is empty. Ensure it is properly configured on the MoPub dashboard: "
-                andDetails: details];
-}
-
-- (MPBLogLevel)logLevel {
-    return MPBLogLevelDebug;
-}
-
-
-@end
-
-
 @implementation UnityAdsErrorFactory
+
++ (NSError *)createErrorWith:(NSString *)description andReason:(NSString *)reason andSuggestion:(NSString *)suggestion {
+    NSDictionary *userInfo = @{
+                               NSLocalizedDescriptionKey: NSLocalizedString(description, nil),
+                               NSLocalizedFailureReasonErrorKey: NSLocalizedString(reason, nil),
+                               NSLocalizedRecoverySuggestionErrorKey: NSLocalizedString(suggestion, nil)
+                               };
+
+    return [NSError errorWithDomain:NSStringFromClass([self class]) code:0 userInfo:userInfo];
+}
 
 -(NSError *)loadErrorForType: (UnityAdsLoadError) type withMessage: (NSString *) message {
     MOPUBErrorCode code;
@@ -90,23 +66,48 @@
     return [NSError errorWithCode:code localizedDescription:description];
 }
 
--(NSError *)showErrorForType: (UnityAdsShowError) type withMessage: (NSString *) message {
-    return nil; // TODO
-}
-
-
-- (id<UnityAdsLogMessage>)loadErrorlogEvent:(UnityAdsLoadError)type withMessage:(NSString *)message {
+-(NSError *)showErrorForType: (UnityAdsShowError) type withMessage: (NSString *) message {    
+    MOPUBErrorCode code;
+    NSString *description;
+    
     switch(type) {
-        case kUnityAdsLoadErrorInitializeFailed:
-            return  [UnityErrorLogEvent newEmptyGameID: message];
+        case kUnityShowErrorNotInitialized:
+            code = MOPUBErrorSDKNotInitialized;
+            description = kUnityAdsAdapterShowErrorNotInitialized;
             break;
- 
+        case kUnityShowErrorNotReady:
+            code = MOPUBErrorUnknown;
+            description = kUnityAdsAdapterShowErrorNotReady;
+            break;
+        case kUnityShowErrorVideoPlayerError:
+            code = MOPUBErrorUnknown;
+            description = kUnityAdsAdapterShowErrorVideoPlayerError;
+            break;
+        case kUnityShowErrorInvalidArgument:
+            code = MOPUBErrorUnknown;
+            description = kUnityAdsAdapterShowErrorInvalidArgument;
+            break;
+        case kUnityShowErrorNoConnection:
+            code = MOPUBErrorUnknown;
+            description = kUnityAdsAdapterShowErrorNoConnection;
+            break;
+        case kUnityShowErrorAlreadyShowing:
+            code = MOPUBErrorUnknown;
+            description = kUnityAdsAdapterShowErrorAlreadyShowing;
+            break;
+        case kUnityShowErrorInternalError:
+            code = MOPUBErrorUnknown;
+            description = kUnityAdsAdapterShowErrorInternalError;
+            break;
         default:
-
+            code = MOPUBErrorUnknown;
+            description = kUnityAdsAdapterShowErrorUnknown;
             break;
     }
-    return nil;
+    
+    return [NSError errorWithCode:code localizedDescription:description];
 }
+
 @end
 
 

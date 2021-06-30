@@ -1,9 +1,8 @@
 //
-//  Header.h
-//  MoPub-TestApp-Local
+//  UnityAdsAbstractAd.h
+//  MoPubSDK
 //
-//  Created by Richard Hawkins on 4/20/21.
-//  Copyright © 2021 Unity Ads. All rights reserved.
+//  Copyright © 2021 MoPub. All rights reserved.
 //
 
 #ifndef Header_h
@@ -20,19 +19,14 @@
 #import "MPError.h"
 #import "UnityAdsErrorFactory.h"
 
-// TODO: Rename this
+// TODO: Rename this?
 struct MoPubError {
     MOPUBErrorCode code;
     NSString *description;
 };
 
-// TODO: Update MoPub dahsboard to include new class UnityAdsInterstitial
-/**
- TODO: doc string.
- */
 @interface UnityAdsAbstractAd : MPFullscreenAdAdapter <MPThirdPartyFullscreenAdAdapter, UnityAdsLoadDelegate, UnityAdsShowDelegate>
 @property (nonatomic) UnityAdsErrorFactory *errorFactory;
-@property (nonatomic) id<UnityAdsLogger> logger;
 
 @end
 
