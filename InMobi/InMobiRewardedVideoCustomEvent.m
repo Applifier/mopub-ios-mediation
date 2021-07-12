@@ -55,6 +55,8 @@
         [self failLoadWithError:accountIdError];
         return;
     }
+    
+    [InMobiAdapterConfiguration setCachedInitializationParameters: info];
 
     NSError * placementIdError = [InMobiAdapterConfiguration validatePlacementId:placementId forOperation:@"rewarded video ad request"];
     if (placementIdError) {
@@ -92,7 +94,7 @@
                                              dspName:nil], [self getAdNetworkId]);
     
     IMCompletionBlock completionBlock = ^{
-        if (adMarkup != nil && adMarkup <= 0) {
+        if ([adMarkup isKindOfClass:[NSString class]] && adMarkup.length > 0) {
             [self.rewardedVideoAd load:[adMarkup dataUsingEncoding:NSUTF8StringEncoding]];
         } else {
             [self.rewardedVideoAd load];
@@ -195,13 +197,12 @@
 }
 
 -(void)interstitial:(IMInterstitial*)interstitial rewardActionCompletedWithRewards:(NSDictionary*)rewards {
+    MPReward *reward = [MPReward unspecifiedReward];
     if (rewards != nil && [rewards count] > 0) {
-        MPReward *reward = [[MPReward alloc] initWithCurrencyType:kMPRewardCurrencyTypeUnspecified amount:[rewards allValues][0]];
-        MPLogInfo(@"InMobi reward action completed with rewards: %@", [rewards description]);
-        [self.delegate fullscreenAdAdapter:self willRewardUser:reward];
-    } else {
-        MPLogInfo(@"InMobi reward action failed, rewards object is empty");
+        reward = [[MPReward alloc] initWithCurrencyType:kMPRewardCurrencyTypeUnspecified amount:[rewards allValues][0]];
     }
+    MPLogInfo(@"InMobi reward action completed with rewards: %@", [rewards description]);
+    [self.delegate fullscreenAdAdapter:self willRewardUser:reward];
 }
 
 @end

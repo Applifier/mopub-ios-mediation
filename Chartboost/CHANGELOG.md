@@ -1,4 +1,10 @@
 ## Changelog
+  * 8.4.2.1
+      * Fix potential race condition when requesting Chartboost ads.
+     
+  * 8.4.2.0
+      * This version of the adapters has been certified with Chartboost 8.4.2 and MoPub SDK 5.17.0.
+
   * 8.4.1.1
       * Add `fullscreenAdAdapterAdWillPresent` and `fullscreenAdAdapterAdDidPresent` to notify publishers of the fullscreen ad show event. Remove `fullscreenAdAdapterAdWillAppear` and  `fullscreenAdAdapterAdDidAppear` as they are now deprecated by the MoPub iOS SDK.
       * Publishers must use v5.17.0 of the MoPub SDK at the minimum.
@@ -138,3 +144,4 @@
 
   * Initial Commit
   	* Adapters moved from [mopub-iOS-sdk](https://github.com/mopub/mopub-ios-sdk) to [mopub-iOS-mediation](https://github.com/mopub/mopub-iOS-mediation/)
+  	
